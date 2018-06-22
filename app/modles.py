@@ -2,7 +2,7 @@ import random, uuid, datetime
 
 from dysms_python.demo_sms_send import send_sms
 from .tables import Sms
-from config import SMS_SIGN_NAME, SMS_TMPL_CODE
+from config import SMS_SIGN_NAME, SMS_TMPL_CODE, SMS_EXPIRY_TIME
 
 def random_num(randomlength = 6):
     '''生成一个指定长度的随机数字字符串
@@ -13,6 +13,13 @@ def random_num(randomlength = 6):
     for _ in range(randomlength):
         random_str += base_str[random.randint(0, length)]
     return random_str
+
+def sms_reqIsRepeat(phone):
+    dt = Sms.query.filter_by(phone = Sms.phone).with_entities(Sms.dtTime).first()
+    return (datetime.datetime.now() - dt[0]).seconds < SMS_EXPIRY_TIME * 60 if dt else False
+
+def sms_reqNoTimes(phone):
+    return Sms.query.filter_by(phone = Sms.phone).with_entities(Sms.times) > SMS_EXPIRY_TIME
 
 def sms_phoneIsAllow(phone, expiryTime=60, TimesMax=5):
     '''是否允许发送短信

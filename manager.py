@@ -1,5 +1,8 @@
 from app import create_app
 from app.mobile import mobile
+from config import DEBUG
+
+global DEBUG
 
 app = create_app()  # 创建APP
 

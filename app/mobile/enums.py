@@ -7,6 +7,7 @@ class SmsCode(Enum):
     phoneErr    = "03"  #非法手机号
     phoneExist  = "04"  #已注册
     rptReq      = "05"  #重复请求
+    noTimes     = "06"  #已达请求次数上限
 
 class RegCode(Enum):
     regSucc    = "00"  #发送成功

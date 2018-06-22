@@ -2,7 +2,7 @@ from flask import render_template, request
 import json
 
 from . import mobile
-from app.modles import sms_send, random_num
+from app.modles import sms_send, random_num, sms_reqIsRepeat
 from .enums import SmsCode, RegCode
 from .modles import userRegistered
 from config import SMS_TMPL_REG
@@ -12,8 +12,18 @@ def sendsms():
     args = request.args if request.method == 'GET' else request.form
     phone = args.get('id', None)
     typ = args.get('type', 0)
+
+    ret={}
+    if phone is None:
+        ret['data'] = SmsCode.parmErr
+    elif sms_reqIsRepeat(phone):
+        ret['data'] = SmsCode.rptReq # 重复请求
+    elif False:
+        ret['data'] = SmsCode.noTimes # 已达当时请求上限
+
     code = random_num()
-    sms_send(phone, code, SMS_TMPL_REG)
+    #sms_send(phone, code, SMS_TMPL_REG)
+    return json.dumps(ret, ensure_ascii=False)
 
 @mobile.route('/AddUser', methods=['GET', 'POST'])  # 添加用户
 def adduser():
