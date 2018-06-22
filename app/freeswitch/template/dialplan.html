@@ -1,0 +1,16 @@
+    <document type="freeswitch/xml">
+        <section name="dialplan" description="RE Dial Plan For FreeSwitch">
+            <context name="default">
+
+                <extension name="call">
+                    <condition field="destination_number" expression="^(10[01][0-9])$">
+                        <action application="export" data="dialed_extension=$1" />
+                        <action application="set" data="call_timeout=30" />
+                        <action application="bridge" data="{{bridges}}" />
+                        <!-- <action application="bridge" data="sofia/internal/camera@120.36.161.238:51328" /> -->
+                    </condition>
+                </extension>
+		
+            </context>
+        </section>
+    </document>

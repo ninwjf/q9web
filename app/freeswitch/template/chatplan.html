@@ -1,0 +1,17 @@
+<document type="freeswitch/xml">
+    <section name="chatplan" description="RE Chat Plan For FreeSwitch">
+        <context name="public">
+
+            <extension name="demo">
+                <condition field="to" expression="^(.*)$">
+                    <!--    <action application="lua" data="test.lua"/> -->
+                    <!--    <action application="reply" data="Hello, you said: ${body}"/> -->
+                    <action application="set" data="to_sip_ip={{to_sip_ip}}"/>
+                    <action application="set" data="to_sip_port={{to_sip_port}}"/>
+
+                </condition>
+            </extension>
+        </context>
+    </section>
+</document>
+    

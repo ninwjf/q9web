@@ -1,0 +1,26 @@
+{
+    "version": "0.1.0",
+    "configurations": [
+        {
+            "name": "Flask",
+            "type": "pythonExperimental",
+            "request": "launch",
+            "pythonPath": "${config:python.pythonPath}",
+            "program": "${workspaceRoot}/.venv/Scripts/flask",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "manager.py"
+            },
+            "args": [
+                "run",
+                "--no-debugger",
+                "--no-reload"
+            ],
+            "jinja": true
+        }
+    ],
+    "command": "${workspaceRoot}/.venv/Scripts/python",
+    "isShellCommand": true,
+    "args": ["${file}"],
+    "showOutput": "always"
+}
