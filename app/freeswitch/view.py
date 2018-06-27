@@ -1,42 +1,33 @@
-from flask import Flask, render_template, request
-from app import app
-import json
-from freeswitch import db, logger
+from flask import render_template, request
 
-@app.route('/fsuser', methods=['POST'])
-def user():
-    user = request.form.get('user', None)
-    domain = request.form.get('domain', None)
-    pwd = db.get_user_password(user)
-    logger.info("user = %s; domain = %s; pwd = %s", user, domain, pwd)
+from . import freeswitch
+from app.public.user import user_getPWD
+from app.public.modles import bridges_get, ipPort_get
+
+
+
+@freeswitch.route('/fsuser', methods=['GET', 'POST'])
+def fsuser():
+    args = request.args if request.method == 'GET' else request.form
+    user = args.get('user', None)
+    domain = args.get('domain', None)
+    pwd =  user_getPWD(user)
     return render_template("user.html", domain = domain, user = user, pwd = pwd)
 
-@app.route('/fsplan', methods=['POST'])
-def dialplan():
-    callee = request.form.get('Caller-Destination-Number', None)
+
+@freeswitch.route('/fsplan', methods=['GET', 'POST'])
+def fsplan():
+    args = request.args if request.method == 'GET' else request.form
+    callee = args.get('Caller-Destination-Number', None)
     bridges = "user/" + callee + "@${domain_name}"
-    for bridge in db.get_bridges_id(callee):
+    for bridge in bridges_get(callee):
         bridges += ", user/" + bridge[0] + "@${domain_name}"
-    logger.info("bridges = %s", bridges)
     return render_template("dialplan.html", bridges = bridges)
 
-@app.route('/chatplan', methods=['POST'])
+@freeswitch.route('/chatplan', methods=['GET', 'POST'])
 def chatplan():
-    sendto = request.form.get('to_user', None)
-    to_ip = db.get_sendto_ip(sendto)
-    to_port = db.get_sendto_port(sendto)
-    logger.info("sendto = %s; to_ip = %s; to_port = %s", sendto, to_ip, to_port)
+    args = request.args if request.method == 'GET' else request.form
+    sendto = args.get('to_user', None) 
+   
+    to_ip, to_port = ipPort_get(sendto)
     return render_template("chatplan.html", to_sip_ip = to_ip, to_sip_port = to_port)
-
-@app.route('/monitor', methods=['POST'])
-def monitor():
-    user_id = request.form.get('user_id', None)
-    monitors = db.get_monitors_id(user_id)
-    logger.info("monitors = %s", monitors)
-    return render_template("monitor.html", monitors = monitors)
-
-@app.route('/SendSMS', methods=['GET', 'POST'])
-def SendSMS():
-    telephone = request.form.get('telephone', None)
-    sendtype = request.form.get('sendtype', None)
-    return json.dumps(t,ensure_ascii=False)
