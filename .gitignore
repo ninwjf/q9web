@@ -1,3 +1,4 @@
 # 不需要版本控制的文件，文件夹
 .venv/
 __pycache__/
+dysms_python/
