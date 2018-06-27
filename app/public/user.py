@@ -21,8 +21,8 @@ def user_checkPWD(phone, pwd):
     return i == 0
 
 def user_getPWD(phone):
-    i = db.session.query(User.pwd).filter(phone == User.phone, USER_OPEN != User.status).first()
-    return i
+    i = db.session.query(User.pwd).filter(phone == User.phone, USER_OPEN == User.status).first()
+    return i[0]
 
 def user_isExist(phone):
     ''' 用户已注册 '''

@@ -46,7 +46,7 @@ def monitor_get(phone, st=STAT_OPEN):
         a.append(i._asdict())
     return a   
 
-############# 管理软件关 ####################
+############# 管理软件相关 ####################
 def comny_add(comnyID, comnyName, st=STAT_OPEN):
     ''' 添加小区 '''
     comny = Community()
