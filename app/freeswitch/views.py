@@ -1,9 +1,7 @@
 from flask import render_template, request
 
 from . import freeswitch
-from app.public.user import user_getPWD
-from app.public.modles import bridges_get, ipPort_get
-
+from .modles import user_getPWD, bridges_get, ipPort_get
 
 
 @freeswitch.route('/fsuser', methods=['GET', 'POST'])

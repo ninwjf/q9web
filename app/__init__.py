@@ -3,16 +3,16 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_apscheduler import APScheduler
 
-from config import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS, JOBS, SCHEDULER_API_ENABLED
+from config import CONFIG
 
 class Config(object):
-    JOBS = JOBS
+    JOBS = CONFIG.JOBS
     # 加入以下参数 启动时，如果任务已经存在数据库中会报错
     # SCHEDULER_JOBSTORES = {
     #     'default': SQLAlchemyJobStore(url=SQLALCHEMY_DATABASE_URI)
     # }
 
-    SCHEDULER_API_ENABLED = SCHEDULER_API_ENABLED    # 定时任务开关
+    SCHEDULER_API_ENABLED = CONFIG.SCHEDULER_API_ENABLED    # 定时任务开关
 
 db = SQLAlchemy()
 scheduler = APScheduler()
@@ -21,8 +21,8 @@ def create_app():
     """创建app的方法"""
     app = Flask(__name__)
     app.config.from_object(Config())
-    app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_TRACK_MODIFICATIONS
+    app.config['SQLALCHEMY_DATABASE_URI'] = CONFIG.SQLALCHEMY_DATABASE_URI
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = CONFIG.SQLALCHEMY_TRACK_MODIFICATIONS
 
     db.init_app(app)
     with app.test_request_context():

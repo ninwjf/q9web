@@ -2,6 +2,12 @@ import datetime
 
 from app import db
 
+# 状态
+class STAT():
+    OPEN    = 0 # 正常，已注册
+    DEL     = 1 # 注销，未注册
+    LOCK    = 2 # 锁定, 已注册
+
 class User(db.Model):
     ''' 用户信息表 '''
     __tablename__ = 'user'

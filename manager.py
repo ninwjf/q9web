@@ -1,9 +1,6 @@
 from app import create_app
 from app.mobile import mobile
 from app.freeswitch import freeswitch
-from config import DEBUG
-
-global DEBUG
 
 app = create_app()  # 创建APP
 

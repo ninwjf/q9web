@@ -2,10 +2,10 @@ from flask import render_template, request
 import json
 
 from . import mobile
-from app.public.sms import sms_send, sms_check, SMS_CODE_PARMERR, SMS_CODE_PHONEEXIST
-from app.public.user import user_registered, user_isExist, user_checkPWD, USER_CODE_PARMERR, USER_CODE_SMSCHKERR, USER_CODE_PWDERR
-from app.public.modles import house_get, CODE, monitor_get
-from config import SMS_TMPL_REG
+from .modles import RETURN, user_isExist, sms_send, sms_check, user_registered, user_checkPWD, house_get, monitor_get
+#from app.public.user import user_registered, user_isExist, user_checkPWD, USER_CODE_PARMERR, USER_CODE_SMSCHKERR, USER_CODE_PWDERR
+#from app.public.modles import house_get, RETURN, monitor_get
+from config import CONFIG
 
 @mobile.route('/SendSMS', methods=['GET', 'POST'])  # 发送短信验证码
 def SendSMS():
@@ -14,11 +14,11 @@ def SendSMS():
 
     ret={}
     if phone is None:
-        ret['Code'] = SMS_CODE_PARMERR     # 参数错误
+        ret = RETURN.PARMERR
     elif user_isExist(phone):
-        ret['Code'] = SMS_CODE_PHONEEXIST  # 已注册
+        ret = RETURN.EXIST
     else:
-        ret['Code'] = sms_send(phone, SMS_TMPL_REG)
+        ret = sms_send(phone, CONFIG.SMS_TMPL_REG)
     return json.dumps(ret, ensure_ascii=False)
 
 
@@ -31,11 +31,11 @@ def AddUser():
 
     ret={}
     if not (phone and pwd and code):    # 参数错误
-        ret['Code'] = USER_CODE_PARMERR
+        ret = RETURN.PARMERR
     elif not sms_check(phone, code):    # 验证码校验
-        ret['Code'] = USER_CODE_SMSCHKERR
+        ret = RETURN.SMSCHKERR
     else:
-        ret['Code'] = user_registered(phone, pwd, code)
+        ret = user_registered(phone, pwd, code)
     return json.dumps(ret, ensure_ascii=False)
 
 
@@ -47,12 +47,11 @@ def MyHouse():
 
     ret={}
     if not (phone and pwd and pwd):    # 参数错误
-        ret['Code'] = CODE.PARMERR
+        ret = RETURN.PARMERR
     elif not user_checkPWD(phone, pwd):
-        ret['Code'] = CODE.PWDERR # 密码错误
+        ret = RETURN.PWDERR # 密码错误
     else:
-        ret['Code'] = CODE.SUCC
-        ret['myhouse'] = house_get(phone)
+        ret = house_get(phone)
 
     return json.dumps(ret, ensure_ascii=False)
 
@@ -65,11 +64,10 @@ def Monitor():
 
     ret={}
     if not (phone and pwd and pwd):    # 参数错误
-        ret['Code'] = CODE.PARMERR
+        ret = RETURN.PARMERR
     elif not user_checkPWD(phone, pwd):
-        ret['Code'] = CODE.PWDERR # 密码错误
+        ret = RETURN.PWDERR # 密码错误
     else:
-        ret['Code'] = CODE.SUCC
-        ret['Monitor'] = monitor_get(phone)
+        ret = monitor_get(phone)
 
     return json.dumps(ret, ensure_ascii=False)
