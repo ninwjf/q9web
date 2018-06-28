@@ -17,12 +17,12 @@ USER_CODE_SMSCHKERR  = "05"  # 验证码不正确
 USER_CODE_PWDERR    = "06"  #密码不正确
 
 def user_checkPWD(phone, pwd):
-    i = User.query.filter(phone == User.phone, pwd == User.pwd, USER_OPEN != User.status).count()
-    return i == 0
+    i = User.query.filter(phone == User.phone, pwd == User.pwd, USER_OPEN == User.status).count()
+    return i > 0
 
 def user_getPWD(phone):
     i = db.session.query(User.pwd).filter(phone == User.phone, USER_OPEN == User.status).first()
-    return i[0]
+    return i[0] if i else None
 
 def user_isExist(phone):
     ''' 用户已注册 '''

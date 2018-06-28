@@ -5,9 +5,6 @@
 import os
 from flask import Blueprint
 
-tmplPath = os.path.join(os.getcwd(), 'app/mobile/templates')
-
-mobile = Blueprint('mobile', __name__,
-    template_folder=tmplPath)
+mobile = Blueprint('mobile', __name__, template_folder='./templates')
 
 from app.mobile import views
