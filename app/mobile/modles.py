@@ -4,18 +4,24 @@ from tables import db, STAT, User, Sms, MyHouse, Monitor
 from config import CONFIG
 from dysms_python.demo_sms_send import send_sms
 
+# 短信类型
+class SMSTYPE():
+    REGT = 0    # 注册
+    PWD = 1     # 找回密码
+
 # 响应信息
 class RETURN():
-    SUCC = {"Code": "00", "MESSAGE":"交易成功"}
-    PARMERR = {"Code": "01", "MESSAGE":"参数错误"}
-    SYSERR = {"Code": "02", "MESSAGE":"系统错误"}
-    PHONEERR = {"Code": "03", "MESSAGE":"非法手机号"}
-    PWDERR = {"Code": "04", "MESSAGE":"密码错误"}
-    SMSCHKERR = {"Code": "05", "MESSAGE":"验证码不正确"}
-    EXIST = {"Code": "06", "MESSAGE":"已注册"}
-    RPTREQ = {"Code": "07", "MESSAGE":"重复请求"}
-    NOTIMES = {"Code": "08", "MESSAGE":"已达请求次数上限"}
+    SUCC        = {"Code": "00", "MESSAGE":"交易成功"}
+    PARMERR     = {"Code": "01", "MESSAGE":"参数错误"}
+    SYSERR      = {"Code": "02", "MESSAGE":"系统错误"}
+    PHONEERR    = {"Code": "03", "MESSAGE":"非法手机号"}
+    PWDERR      = {"Code": "04", "MESSAGE":"密码错误"}
+    SMSCHKERR   = {"Code": "05", "MESSAGE":"验证码不正确"}
+    EXIST       = {"Code": "06", "MESSAGE":"已注册"}
+    RPTREQ      = {"Code": "07", "MESSAGE":"重复请求"}
+    NOTIMES     = {"Code": "08", "MESSAGE":"已达请求次数上限"}
     AMOUNTEMPTY = {"Code": "09", "MESSAGE":"账户余额不足"}
+    NOTEXIST    = {"Code": "10", "MESSAGE":"用户不存在"}
 
 
 
@@ -29,6 +35,14 @@ def house_get(phone, st=STAT.OPEN):
     ret = RETURN.SUCC.copy()    #必需使用
     ret['myhouse'] = a
     return ret
+
+def monitor_open(sip):
+    #二维码开锁，未实现
+    return RETURN.SUCC
+
+def monitor_chk(phone, sip):
+    i = Monitor.query.filter(phone == Monitor.phone, sip == Monitor.sip, STAT.OPEN == Monitor.status).count()
+    return i > 0
 
 def monitor_get(phone, st=STAT.OPEN):
     ''' 获取可监控设备列表 '''
@@ -50,9 +64,15 @@ def user_isExist(phone):
     i = User.query.filter(phone == User.phone, STAT.DEL != User.status).count()
     return i > 0
 
-def user_registered(phone, pwd, code):
-    if user_isExist(phone):
-        return RETURN.EXIST
+def user_chgpwd(phone, pwd):
+    ''' 修改密码 '''
+    user = User.query.filter(phone == User.phone).first()
+    if user:
+        user.pwd = pwd
+        db.session.commit()
+    return RETURN.SUCC
+
+def user_registered(phone, pwd):
     user_addOrChg(phone, pwd)
     return RETURN.SUCC
 
@@ -119,26 +139,21 @@ def sms_check(phone, code, seconds=CONFIG.SMS_EXPIRY_TIME):
 
 def sms_send(phone, tmpl = CONFIG.SMS_TMPL_CODE):
     '''短信发送'''
-    if sms_reqIsRepeat(phone):
-        return RETURN.RPTREQ  # 重复请求
-    elif sms_reqNoTimes(phone):
-        return RETURN.NOTIMES     # 已达当时请求上限
-    else: 
-        code = random_num()
-        sms_add(phone, code)
-        
-        if CONFIG.DEBUG: return RETURN.SUCC
+    code = random_num()
+    sms_add(phone, code)
+    
+    if CONFIG.DEBUG: return RETURN.SUCC
 
-        s = send_sms(uuid.uuid1(), phone, CONFIG.SMS_SIGN_NAME, tmpl, "{\"code\":\"%s\"}" % code)
-        ret = json.loads(s)['Code']
-        if ret == 'OK':
-            return RETURN.SUCC
-        elif ret == 'isv.MOBILE_NUMBER_ILLEGAL':
-            return RETURN.PHONEERR
-        elif ret == 'isv.AMOUNT_NOT_ENOUGH':
-            return RETURN.AMOUNTEMPTY
-        else:
-            return RETURN.SYSERR
+    s = send_sms(uuid.uuid1(), phone, CONFIG.SMS_SIGN_NAME, tmpl, "{\"code\":\"%s\"}" % code)
+    ret = json.loads(s)['Code']
+    if ret == 'OK':
+        return RETURN.SUCC
+    elif ret == 'isv.MOBILE_NUMBER_ILLEGAL':
+        return RETURN.PHONEERR
+    elif ret == 'isv.AMOUNT_NOT_ENOUGH':
+        return RETURN.AMOUNTEMPTY
+    else:
+        return RETURN.SYSERR
 
 def sms_del(expiryTime = CONFIG.SMS_EXPIRY_TIME):
     ''' 定时清理验证码表 '''
