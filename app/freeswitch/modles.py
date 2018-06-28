@@ -14,4 +14,5 @@ def bridges_get(sip, st=STAT.OPEN):
 
 def ipPort_get(sip):
     ''' 获取设备IP端口 '''
-    return db.session.query(Registrations.ip, Registrations.network_port).filter(Registrations.reg_user == sip).first()
+    i = db.session.query(Registrations.network_ip, Registrations.network_port).filter(Registrations.reg_user == sip).first()
+    return i.network_ip, i.network_port
