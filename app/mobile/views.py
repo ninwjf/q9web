@@ -125,8 +125,10 @@ def Opendoor():
         ret = RETURN.PARMERR
     elif not user_isExist(phone):    # 用户不存在
         ret = RETURN.NOTEXIST
+    elif not user_checkPWD(phone, pwd):
+        ret = RETURN.PWDERR # 密码错误
     elif not monitor_chk(phone, sip):    # 设备校验
-        ret = RETURN.SMSCHKERR
+        ret = RETURN.MNITNOEXIT
     else:
         ret = monitor_open(sip)
     return json.dumps(ret, ensure_ascii=False)

@@ -22,6 +22,7 @@ class RETURN():
     NOTIMES     = {"Code": "08", "MESSAGE":"已达请求次数上限"}
     AMOUNTEMPTY = {"Code": "09", "MESSAGE":"账户余额不足"}
     NOTEXIST    = {"Code": "10", "MESSAGE":"用户不存在"}
+    MNITNOEXIT  = {"Code": "11", "MESSAGE":"监控设备不存在"}
 
 
 
@@ -38,7 +39,9 @@ def house_get(phone, st=STAT.OPEN):
 
 def monitor_open(sip):
     #二维码开锁，未实现
-    return RETURN.SUCC
+    ret = RETURN.SUCC.copy()
+    ret['key'] = sip
+    return ret
 
 def monitor_chk(phone, sip):
     i = Monitor.query.filter(phone == Monitor.phone, sip == Monitor.sip, STAT.OPEN == Monitor.status).count()
