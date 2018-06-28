@@ -2,7 +2,7 @@ from flask import render_template, request
 import json
 
 from . import mobile
-from .modles import RETURN, SMSTYPE, user_isExist, sms_send, sms_check, user_registered, user_checkPWD, house_get, monitor_get, user_chgpwd, sms_reqIsRepeat, sms_reqNoTimes
+from .modles import RETURN, SMSTYPE, user_isExist, sms_send, sms_check, user_registered, user_checkPWD, house_get, monitor_get, user_chgpwd, sms_reqIsRepeat, sms_reqNoTimes, monitor_chk, monitor_open
 from config import CONFIG
 
 @mobile.route('/SendSMS', methods=['GET', 'POST'])  # 发送短信验证码
