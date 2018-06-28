@@ -144,8 +144,6 @@ def sms_send(phone, tmpl = CONFIG.SMS_TMPL_CODE):
     '''短信发送'''
     code = random_num()
     sms_add(phone, code)
-    
-    if CONFIG.DEBUG: return RETURN.SUCC
 
     s = send_sms(uuid.uuid1(), phone, CONFIG.SMS_SIGN_NAME, tmpl, "{\"code\":\"%s\"}" % code)
     ret = json.loads(s)['Code']

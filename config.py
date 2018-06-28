@@ -9,9 +9,6 @@ load_dotenv(os.path.join(basedir, '.env'))
 
 """
 class CONFIG():
-    # 测试模式？
-    DEBUG = True
-
     #服务监听端口
     PORT = 5050
 

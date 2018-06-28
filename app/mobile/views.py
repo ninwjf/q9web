@@ -9,7 +9,7 @@ from config import CONFIG
 def SendSMS():
     args = request.args if request.method == 'GET' else request.form
     phone = args.get('id', None)
-    typee = args.get('type', None)
+    typee = args.get('type', SMSTYPE.REGT)
 
     ret={}
     if phone is None:
@@ -21,7 +21,11 @@ def SendSMS():
     elif sms_reqNoTimes(phone):
         ret = RETURN.NOTIMES     # 已达当时请求上限
     else:
-        ret = sms_send(phone, CONFIG.SMS_TMPL_REG)
+        if typee == SMSTYPE.REGT:
+            ret = sms_send(phone, CONFIG.SMS_TMPL_REG)
+        elif typee == SMSTYPE.PWD:
+            ret = sms_send(phone, CONFIG.SMS_TMPL_PWD)
+
     return json.dumps(ret, ensure_ascii=False)
 
 
