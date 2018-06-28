@@ -3,8 +3,6 @@ import json
 
 from . import mobile
 from .modles import RETURN, user_isExist, sms_send, sms_check, user_registered, user_checkPWD, house_get, monitor_get
-#from app.public.user import user_registered, user_isExist, user_checkPWD, USER_CODE_PARMERR, USER_CODE_SMSCHKERR, USER_CODE_PWDERR
-#from app.public.modles import house_get, RETURN, monitor_get
 from config import CONFIG
 
 @mobile.route('/SendSMS', methods=['GET', 'POST'])  # 发送短信验证码

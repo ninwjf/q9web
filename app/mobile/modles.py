@@ -26,7 +26,7 @@ def house_get(phone, st=STAT.OPEN):
     for i in houses:
         a.append(i._asdict())
 
-    ret = RETURN.SUCC
+    ret = RETURN.SUCC.copy()    #必需使用
     ret['myhouse'] = a
     return ret
 
@@ -37,7 +37,7 @@ def monitor_get(phone, st=STAT.OPEN):
     for i in monit:
         a.append(i._asdict())
 
-    ret = RETURN.SUCC
+    ret = RETURN.SUCC.copy()
     ret['Monitor'] = a
     return ret
 
