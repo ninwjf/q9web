@@ -16,6 +16,8 @@ def SendSMS():
         ret = RETURN.PARMERR
     elif typee == SMSTYPE.REGT and user_isExist(phone):
         ret = RETURN.EXIST   # 已注册
+    elif typee == SMSTYPE.PWD and not user_isExist(phone):
+        ret = RETURN.NOTEXIST # 用户不存在
     elif sms_reqIsRepeat(phone):
         ret = RETURN.RPTREQ  # 重复请求
     elif sms_reqNoTimes(phone):
