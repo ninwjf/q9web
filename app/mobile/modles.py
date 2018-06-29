@@ -6,8 +6,8 @@ from dysms_python.demo_sms_send import send_sms
 
 # 短信类型
 class SMSTYPE():
-    REGT = 0    # 注册
-    PWD = 1     # 找回密码
+    REGT = '0'    # 注册
+    PWD = '1'     # 找回密码
 
 # 响应信息
 class RETURN():
