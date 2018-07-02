@@ -11,7 +11,7 @@ def SendSMS():
     phone = args.get('id', None)
     typee = args.get('type', SMSTYPE.REGT)
 
-    ret={}
+    ret=RETURN.SYSERR
     if phone is None:
         ret = RETURN.PARMERR
     elif typee == SMSTYPE.REGT and user_isExist(phone):
@@ -38,7 +38,7 @@ def AddUser():
     pwd = args.get('pwd', None)
     code = args.get('smsCode', None)
 
-    ret={}
+    ret=RETURN.SYSERR
     if not (phone and pwd and code):    # 参数错误
         ret = RETURN.PARMERR
     elif user_isExist(phone):
@@ -56,7 +56,7 @@ def MyHouse():
     phone = args.get('id', None)
     pwd = args.get('pwd', None)
 
-    ret={}
+    ret=RETURN.SYSERR
     if not (phone and pwd and pwd):    # 参数错误
         ret = RETURN.PARMERR
     elif not user_checkPWD(phone, pwd):
@@ -73,7 +73,7 @@ def Monitor():
     phone = args.get('id', None)
     pwd = args.get('pwd', None)
 
-    ret={}
+    ret=RETURN.SYSERR
     if not (phone and pwd and pwd):    # 参数错误
         ret = RETURN.PARMERR
     elif not user_checkPWD(phone, pwd):
@@ -90,7 +90,7 @@ def ChgPwd():
     pwd = args.get('pwd', None)
     newpwd = args.get('newPwd', None)
 
-    ret={}
+    ret=RETURN.SYSERR
     if not (phone and pwd and newpwd):    # 参数错误
         ret = RETURN.PARMERR
     elif not user_isExist(phone):    # 用户不存在
@@ -108,7 +108,7 @@ def FindPwd():
     pwd = args.get('pwd', None)
     code = args.get('smsCode', None)
 
-    ret={}
+    ret=RETURN.SYSERR
     if not (phone and pwd and code):    # 参数错误
         ret = RETURN.PARMERR
     elif not user_isExist(phone):    # 用户不存在
@@ -126,7 +126,7 @@ def Opendoor():
     pwd = args.get('pwd', None)
     sip = args.get('sip', None)
 
-    ret={}
+    ret=RETURN.SYSERR
     if not (phone and pwd and sip):    # 参数错误
         ret = RETURN.PARMERR
     elif not user_isExist(phone):    # 用户不存在
