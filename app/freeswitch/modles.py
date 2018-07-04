@@ -4,7 +4,7 @@ def user_getPWD(phone):
     i = db.session.query(User.pwd).filter(phone == User.phone, STAT.OPEN == User.status).first()
     return i[0] if i else None
     
-def bridges_get(sip, st=STAT.OPEN):
+def phones_get(sip, st=STAT.OPEN):
     ''' 获取呼叫列表 '''
     bridges = db.session.query(MyHouse.phone).filter(MyHouse.sip == sip, MyHouse.status == st).all()
     a = []
