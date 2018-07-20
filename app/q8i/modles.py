@@ -1,6 +1,6 @@
 import datetime, json, inspect
 
-from tables import db, STAT, Community, MyHouse, Monitor, User
+from tables import db, STAT, Community, MyHouse, Monitor, User, Community
 
 # 响应信息
 class RETURN():
@@ -69,3 +69,26 @@ def user_add(monitor):
         user.status = STAT.OPEN
         User.add()
     db.session.commit()
+
+def user_list(community, st = STAT.OPEN):
+    houses = db.session.query(MyHouse.phone, MyHouse.site).filter(community == MyHouse.communityID, st == MyHouse.status).all()
+    a = []
+    for i in houses:
+        a.append(i._asdict())
+
+    ret = RETURN.SUCC.copy()
+    ret['houses'] = a
+    return ret
+
+def comny_login(community, pwd, st = STAT.OPEN):
+    i = Community.query.filter(community == Community.id, pwd == Community.pwd, st == Community.status).count()
+    return RETURN.SUCC if i > 0 else RETURN.PWDERR
+
+def comny_chgPwd(community, pwd, newPwd, st = STAT.OPEN):
+    user = Community.query.filter(community == Community.id, pwd == Community.pwd, st == Community.status).first()
+    if user:
+        user.pwd = newPwd
+        db.session.commit()
+        return RETURN.SUCC
+    else:
+        return RETURN.PWDERR

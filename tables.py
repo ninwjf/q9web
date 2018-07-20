@@ -50,6 +50,7 @@ class Community(db.Model):
     __tablename__ = 'community'
     id = db.Column(db.String(5), db.Sequence('cmny_id_seq'), primary_key=True)
     community = db.Column(db.String(100))
+    pwd = db.Column(db.String(16))
     status = db.Column(db.Integer)
 
 class Monitor(db.Model):

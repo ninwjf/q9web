@@ -2,7 +2,7 @@ import json
 from flask import render_template, request
 
 from . import q8i
-from .modles import house_add, house_del, monitor_add, monitor_del
+from .modles import RETURN, house_add, house_del, monitor_add, monitor_del, user_list, comny_login, comny_chgPwd
 
 @q8i.route('/MyhouseAdd', methods=['GET', 'POST'])
 def myhouseAdd():   # 住宅关联
@@ -56,4 +56,44 @@ def Monitor():  # 监控设备批量增加
     data = json.loads(request.get_data())
 
     ret = data['Monitor']
+    return json.dumps(ret, ensure_ascii=False)
+
+@q8i.route('/warn', methods=['GET', 'POST'])
+def warn():     # 安防信息批量推送
+    args = request.args if request.method == 'GET' else request.form
+    room = args.get('room', None)
+
+    data = json.loads(request.get_data())
+    ret = data['warn']
+    
+    return json.dumps(ret, ensure_ascii=False)
+
+@q8i.route('/houselist', methods=['GET', 'POST'])
+def houselist():    # 用户列表
+    args = request.args if request.method == 'GET' else request.form
+    community = args.get('community', None)
+
+    ret = RETURN.SYSERR
+    ret = user_list(community)
+    return json.dumps(ret, ensure_ascii=False)
+
+@q8i.route('/login', methods=['GET', 'POST'])
+def login():    # 用户列表
+    args = request.args if request.method == 'GET' else request.form
+    pwd = args.get('pwd', None)
+    community = args.get('comnyID', None)
+
+    ret = RETURN.SYSERR
+    ret = comny_login(community, pwd)
+    return json.dumps(ret, ensure_ascii=False)
+
+@q8i.route('chgPwd', methods=['GET', 'POST'])
+def chgpwd():
+    args = request.args if request.method == 'GET' else request.form
+    pwd = args.get('pwd', None)
+    newPwd = args.get('newPwd', None)
+    community = args.get('comnyID', None)
+
+    ret = RETURN.SYSERR
+    ret = comny_chgPwd(community, pwd, newPwd)
     return json.dumps(ret, ensure_ascii=False)
