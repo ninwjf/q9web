@@ -38,5 +38,7 @@ def chatplan(): # 短信发送配置
     args = request.args if request.method == 'GET' else request.form
     sendto = args.get('to_user', None)
    
+    if sendto[:3] == "Cam":
+       sendto = sendto[3:]
     to_ip, to_port = ipPort_get(sendto)
     return render_template("chatplan.html", to_sip_ip = to_ip, to_sip_port = to_port)
