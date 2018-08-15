@@ -2,6 +2,8 @@ from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_apscheduler import APScheduler
+from flask import render_template
+from flask_socketio import SocketIO
 
 from config import CONFIG
 
@@ -17,6 +19,9 @@ class Config(object):
 db = SQLAlchemy()
 scheduler = APScheduler()
 
+async_mode = None
+socketio = SocketIO()
+
 def create_app():
     """创建app的方法"""
     app = Flask(__name__)
@@ -27,8 +32,22 @@ def create_app():
     db.init_app(app)
     with app.test_request_context():
         db.create_all()
-    scheduler.init_app(app)
-    scheduler.start()
+    # scheduler.init_app(app)
+    # scheduler.start()
+
+    socketio.init_app(app=app, async_mode=async_mode)
+
+    from app.mobile import mobile
+    from app.freeswitch import freeswitch
+    from app.q8i import q8i
+    from app.socketio import sio
+
+    # 注册蓝图
+    app.register_blueprint(mobile, url_prefix='/mobile')    # 手机APP相关
+    app.register_blueprint(freeswitch, url_prefix='/freeswitch')    # freeswitch相关
+    app.register_blueprint(q8i, url_prefix='/q8i')    # 管理中心接口 
+    app.register_blueprint(sio, url_prefix='/soktio')    # 管理中心接口 websocket
+
 
     return app
 

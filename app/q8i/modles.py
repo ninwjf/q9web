@@ -1,6 +1,7 @@
 import datetime, json, inspect
 
-from tables import db, STAT, Community, MyHouse, Monitor, User, Community
+from tables import db, STAT, Community, MyHouse, Monitor, User, Community, Registrations
+#from freeswitch.fs_chat import send_chat
 
 # 响应信息
 class RETURN():
@@ -92,3 +93,16 @@ def comny_chgPwd(community, pwd, newPwd, st = STAT.OPEN):
         return RETURN.SUCC
     else:
         return RETURN.PWDERR
+
+def fs_sendChat(community, msg, dir, st = STAT.OPEN):
+    # 获取发送SIP列表
+    houses = db.session.query(MyHouse.phone).filter(community == MyHouse.communityID, dir == MyHouse.site, st == MyHouse.status).all()
+    for i in houses:
+        # 通过SIP号查询 IP端口
+        seder = db.session.query(Registrations.network_ip, Registrations.network_port).filter(Registrations.reg_user == i.phone).first()
+        # 发送消息
+        #send_chat(i.phone, seder.network_ip, seder.network_port, msg)
+
+
+    ret = RETURN.SUCC.copy()
+    return ret

@@ -4,3 +4,5 @@ __pycache__/
 dysms_python/
 .vscode/
 test/
+freeswitch/_ESL.so
+freeswitch/ESL.py

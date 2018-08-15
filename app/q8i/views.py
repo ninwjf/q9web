@@ -1,8 +1,10 @@
 import json
 from flask import render_template, request
+from flask_socketio import send, emit
 
+#from app import socketio
 from . import q8i
-from .modles import RETURN, house_add, house_del, monitor_add, monitor_del, user_list, comny_login, comny_chgPwd
+from .modles import RETURN, house_add, house_del, monitor_add, monitor_del, user_list, comny_login, comny_chgPwd, fs_sendChat
 
 @q8i.route('/MyhouseAdd', methods=['GET', 'POST'])
 def myhouseAdd():   # 住宅关联
@@ -15,7 +17,6 @@ def myhouseAdd():   # 住宅关联
     ret = []
     house_add(phone, comnyID, comnyName, site)
     return json.dumps(ret, ensure_ascii=False)
-
 
 @q8i.route('/MyhouseDel', methods=['GET', 'POST'])
 def myhouseDel():   # 住宅取关
@@ -87,7 +88,7 @@ def login():    # 用户列表
     ret = comny_login(community, pwd)
     return json.dumps(ret, ensure_ascii=False)
 
-@q8i.route('chgPwd', methods=['GET', 'POST'])
+@q8i.route('/chgPwd', methods=['GET', 'POST'])
 def chgpwd():
     args = request.args if request.method == 'GET' else request.form
     pwd = args.get('pwd', None)
@@ -97,3 +98,28 @@ def chgpwd():
     ret = RETURN.SYSERR
     ret = comny_chgPwd(community, pwd, newPwd)
     return json.dumps(ret, ensure_ascii=False)
+
+@q8i.route('/sendMsg', methods=['GET', 'POST'])
+def sendMsg():
+    args = request.args if request.method == 'GET' else request.form
+    msgTxt = args.get('msgTxt', None)
+    community = args.get('comnyID', None)
+    msgDir = args.get('msgDir', None)
+
+    ret = RETURN.SYSERR
+    if msgDir:
+        fs_sendChat(community, msgTxt, msgDir)
+    else:
+        pass
+    #ret = comny_chgPwd(community, pwd, newPwd)
+    return json.dumps(ret, ensure_ascii=False)
+
+# @socketio.on('connect')
+# def connect():
+#    """ 服务器发送通信请求 """
+#    pass
+#
+#
+#@socketio.on('connect_event')
+#def refresh_message(msg):
+#    emit('server_response', {'data': msg['data']})

@@ -50,7 +50,7 @@ def AddUser():
     return json.dumps(ret, ensure_ascii=False)
 
 
-@mobile.route('/MyHouse', methods=['GET', 'POST'])  # 添加用户
+@mobile.route('/MyHouse', methods=['GET', 'POST'])  #  获取房间列表
 def MyHouse():
     args = request.args if request.method == 'GET' else request.form
     phone = args.get('id', None)
@@ -67,7 +67,7 @@ def MyHouse():
     return json.dumps(ret, ensure_ascii=False)
 
 
-@mobile.route('/Monitor', methods=['GET', 'POST'])  # 添加用户
+@mobile.route('/Monitor', methods=['GET', 'POST'])  # 获取可监控设备列表
 def Monitor():
     args = request.args if request.method == 'GET' else request.form
     phone = args.get('id', None)
