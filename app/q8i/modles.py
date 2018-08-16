@@ -60,18 +60,28 @@ def monitor_del(phone, comnyID, site):
     db.session.delete(monitor)
     db.session.commit()
 
-def user_add(monitor):
+def user_add(comnyID, monitors):
     ''' 批量增加监控设备 '''
-    for i in  monitor:
+    # 删除小区注册门口机SIP号
+    ret = RETURN.SUCC.copy()
+    users = User.query.filter(User.phone.like(comnyID + "%") if comnyID is not None else "").all()
+    if users:
+        db.session.delete(users)
+    
+    js = json.loads(monitors)
+    for i in  js:
         user = User()
-        user.phone = i.community + i.site
-        user.pwd = i.pwd
-        user.dtTime = datetime.datetime.now()
-        user.status = STAT.OPEN
-        User.add()
+        user.phone = i['Phone']
+        user.pwd = i['Pwd']
+        user.dtTime = i['DtTime']
+        user.status = i['Status']
+        db.session.add(user)
+        a = user._asdict()
     db.session.commit()
+    return ret
 
 def user_list(community, st = STAT.OPEN):
+    ''' 获取小区用户列表 '''
     houses = db.session.query(MyHouse.phone, MyHouse.site).filter(community == MyHouse.communityID, st == MyHouse.status).all()
     a = []
     for i in houses:
@@ -82,10 +92,12 @@ def user_list(community, st = STAT.OPEN):
     return ret
 
 def comny_login(community, pwd, st = STAT.OPEN):
+    ''' 小区权限验证 '''
     i = Community.query.filter(community == Community.id, pwd == Community.pwd, st == Community.status).count()
     return RETURN.SUCC if i > 0 else RETURN.PWDERR
 
 def comny_chgPwd(community, pwd, newPwd, st = STAT.OPEN):
+    ''' 小区SIP管理员修改密码 '''
     user = Community.query.filter(community == Community.id, pwd == Community.pwd, st == Community.status).first()
     if user:
         user.pwd = newPwd

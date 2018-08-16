@@ -4,7 +4,11 @@ from flask_socketio import send, emit
 
 #from app import socketio
 from . import q8i
-from .modles import RETURN, house_add, house_del, monitor_add, monitor_del, user_list, comny_login, comny_chgPwd, fs_sendChat
+from .modles import RETURN, fs_sendChat
+from .modles import house_add, house_del
+from .modles import monitor_add, monitor_del
+from .modles import user_add, user_list
+from .modles import comny_login, comny_chgPwd  
 
 @q8i.route('/MyhouseAdd', methods=['GET', 'POST'])
 def myhouseAdd():   # 住宅关联
@@ -52,17 +56,17 @@ def MonitorDel():   # 监控设备取关
     monitor_del(phone, comnyID, site)
     return json.dumps(ret, ensure_ascii=False)
 
-@q8i.route('/Monitor', methods=['GET', 'POST'])
-def Monitor():  # 监控设备批量增加
+@q8i.route('/Monitor2SIP', methods=['GET', 'POST'])
+def Monitor():  # 监控设备 添加 SIP账号
     data = json.loads(request.get_data())
 
-    ret = data['Monitor']
+    ret = user_add(data['comnyID'], data['Monitors'])
     return json.dumps(ret, ensure_ascii=False)
 
 @q8i.route('/warn', methods=['GET', 'POST'])
 def warn():     # 安防信息批量推送
-    args = request.args if request.method == 'GET' else request.form
-    room = args.get('room', None)
+    #args = request.args if request.method == 'GET' else request.form
+    #room = args.get('room', None)
 
     data = json.loads(request.get_data())
     ret = data['warn']
