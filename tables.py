@@ -63,8 +63,9 @@ class MyHouse(db.Model):
 class Community(db.Model):
     ''' 小区 '''
     __tablename__ = 'community'
-    id = db.Column(db.String(5), db.Sequence('cmny_id_seq'), primary_key=True)
+    id = db.Column(db.Integer, db.Sequence('cmny_id_seq'), primary_key=True)
     community = db.Column(db.String(100))
+    communityID = db.Column(db.String(5))
     pwd = db.Column(db.String(16))
     status = db.Column(db.Integer)
 

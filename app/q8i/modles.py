@@ -1,6 +1,6 @@
 import datetime, json, inspect, random
 
-from tables import db, STAT, Community, MyHouse, Monitor, User, Community, Registrations
+from tables import db, STAT, Community, MyHouse, Monitor, User, Registrations
 #from freeswitch.fs_chat import send_chat
 
 # 响应信息
@@ -10,15 +10,6 @@ class RETURN():
     SYSERR      = {"Code": "02", "MESSAGE":"系统错误"}
     COMNYERR    = {"Code": "03", "MESSAGE":"小区不存在"}
     PWDERR      = {"Code": "04", "MESSAGE":"密码错误"}
-
-# def comny_add(comnyID, comnyName, st=STAT.OPEN):
-#     ''' 添加小区 '''
-#     comny = Community()
-#     comny.id = comnyID
-#     comny.community = comnyName
-#     comny.status = st
-#     db.session.add(comny)
-#     db.session.commit()
 
 def house_add(phone, comnyID, comnyName, site, st=STAT.OPEN):
     ''' 添加住宅信息 '''
@@ -104,12 +95,12 @@ def user_list(community, st = STAT.OPEN):
 
 def comny_login(community, pwd, st = STAT.OPEN):
     ''' 小区权限验证 '''
-    i = Community.query.filter(community == Community.id, pwd == Community.pwd, st == Community.status).count()
+    i = Community.query.filter(community == Community.communityID, pwd == Community.pwd, st == Community.status).count()
     return RETURN.SUCC if i > 0 else RETURN.PWDERR
 
 def comny_chgPwd(community, pwd, newPwd, st = STAT.OPEN):
     ''' 小区SIP管理员修改密码 '''
-    user = Community.query.filter(community == Community.id, pwd == Community.pwd, st == Community.status).first()
+    user = Community.query.filter(community == Community.communityID, pwd == Community.pwd, st == Community.status).first()
     if user:
         user.pwd = newPwd
         db.session.commit()
