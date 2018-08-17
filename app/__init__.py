@@ -30,8 +30,6 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = CONFIG.SQLALCHEMY_TRACK_MODIFICATIONS
 
     db.init_app(app)
-    with app.test_request_context():
-        db.create_all()
     # scheduler.init_app(app)
     # scheduler.start()
 
@@ -42,6 +40,8 @@ def create_app():
     from app.q8i import q8i
     from app.socketio import sio
 
+    with app.test_request_context():
+        db.create_all()
     # 注册蓝图
     app.register_blueprint(mobile, url_prefix='/mobile')    # 手机APP相关
     app.register_blueprint(freeswitch, url_prefix='/freeswitch')    # freeswitch相关
