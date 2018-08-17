@@ -87,7 +87,6 @@ def user_add(comnyID, monitors):
         user.pwd = random_pwd()
         db.session.add(user)
         monitor.append(user.user2json())
-    print(monitor)
     ret['Monitors'] = monitor
     db.session.commit()
     return ret
