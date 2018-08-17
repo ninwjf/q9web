@@ -1,4 +1,4 @@
-import datetime
+import datetime, json
 
 from app import db
 
@@ -16,6 +16,21 @@ class User(db.Model):
     pwd = db.Column(db.String(16))
     dtTime = db.Column(db.DateTime)
     status = db.Column(db.Integer)
+
+    def json2user(self, json):
+        self.phone = json['Phone']
+        self.pwd = json['Pwd']
+        self.dtTime = json['DtTime']
+        self.status = json['Status']
+        return self
+
+    def user2json(self):
+        return {
+            "Phone": self.phone,
+            "Pwd": self.pwd,
+            "DtTime": self.dtTime,
+            "Status": self.status
+        }
 
     def __repr__(self):
         return '<User %r>' % self.i

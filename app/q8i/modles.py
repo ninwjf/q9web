@@ -1,4 +1,4 @@
-import datetime, json, inspect
+import datetime, json, inspect, random
 
 from tables import db, STAT, Community, MyHouse, Monitor, User, Community, Registrations
 #from freeswitch.fs_chat import send_chat
@@ -60,23 +60,35 @@ def monitor_del(phone, comnyID, site):
     db.session.delete(monitor)
     db.session.commit()
 
+def random_pwd(randomlength = 6):
+    '''生成一个指定长度的随机数字字符串'''
+    random_str = ''
+    base_str = '0123456789'
+    base_str += 'abcdefghijklmnopqrstuvwxyz'
+    base_str += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    length = len(base_str) - 1
+    for _ in range(randomlength):
+        random_str += base_str[random.randint(0, length)]
+    return random_str
+
 def user_add(comnyID, monitors):
     ''' 批量增加监控设备 '''
     # 删除小区注册门口机SIP号
     ret = RETURN.SUCC.copy()
     users = User.query.filter(User.phone.like(comnyID + "%") if comnyID is not None else "").all()
-    if users:
-        db.session.delete(users)
-    
+    for j in users:
+        db.session.delete(j)
+
+    ret = RETURN.SUCC.copy()
     js = json.loads(monitors)
+    monitor = []
     for i in  js:
-        user = User()
-        user.phone = i['Phone']
-        user.pwd = i['Pwd']
-        user.dtTime = i['DtTime']
-        user.status = i['Status']
+        user = User().json2user(i)
+        user.pwd = random_pwd()
         db.session.add(user)
-        a = user._asdict()
+        monitor.append(user.user2json())
+    print(monitor)
+    ret['Monitors'] = monitor
     db.session.commit()
     return ret
 
