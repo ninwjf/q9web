@@ -6,3 +6,4 @@ dysms_python/
 test/
 freeswitch/_ESL.so
 freeswitch/ESL.py
+freeswitch/fs_chat.py
