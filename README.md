@@ -1,4 +1,4 @@
-"# q9web" 
+"# q9web"
 ├── App    # App应用程序 Flask对象
 │   ├── MobileApp  # 分块的手机APP模块，后台模块
 │   │   ├── __init__.py  # Admin模块初始化文件，创建admin蓝图对象
