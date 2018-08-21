@@ -112,7 +112,7 @@ def sendMsg():
 
     ret = RETURN.SYSERR
     if msgDir:
-        fs_sendChat(community, msgTxt, msgDir)
+        ret = fs_sendChat(community, msgTxt, msgDir)
     else:
         pass
     #ret = comny_chgPwd(community, pwd, newPwd)

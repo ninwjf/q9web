@@ -1,7 +1,7 @@
 import datetime, json, inspect, random
 
 from tables import db, STAT, Community, MyHouse, Monitor, User, Registrations
-from freeswitch.fs_chat import send_chat
+from fs_ESL.fs_chat import send_chat
 
 # 响应信息
 class RETURN():
@@ -113,9 +113,9 @@ def fs_sendChat(community, msg, dir, st = STAT.OPEN):
     houses = db.session.query(MyHouse.phone).filter(community == MyHouse.communityID, dir == MyHouse.site, st == MyHouse.status).all()
     for i in houses:
         # 通过SIP号查询 IP端口
-        seder = db.session.query(Registrations.network_ip, Registrations.network_port).filter(Registrations.reg_user == i.phone).first()
+        seder = db.session.query(Registrations.realm, Registrations.network_ip, Registrations.network_port).filter(Registrations.reg_user == i.phone).first()
         # 发送消息
-        send_chat(i.phone, seder.network_ip, seder.network_port, msg)
+        send_chat(i.phone + "@" + seder.realm, seder.network_ip, seder.network_port, msg)
 
 
     ret = RETURN.SUCC.copy()

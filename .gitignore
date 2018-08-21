@@ -4,6 +4,4 @@ __pycache__/
 dysms_python/
 .vscode/
 test/
-freeswitch/_ESL.so
-freeswitch/ESL.py
-freeswitch/fs_chat.py
+fs_ESL/fs_chat.py
