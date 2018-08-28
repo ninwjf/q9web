@@ -54,7 +54,7 @@ def create_app():
 
 ##############################无用代码##############################################
 if False:   # pylint报错另类屏蔽方法。。。
-    from sqlalchemy import Column, String, Sequence, DateTime, Integer
+    from sqlalchemy import Column, String, Sequence, DateTime, Integer, Text
     from sqlalchemy.orm import Session
     db.Column = Column
     db.String = String
@@ -62,3 +62,4 @@ if False:   # pylint报错另类屏蔽方法。。。
     db.DateTime = DateTime
     db.Integer = Integer
     db.session = Session()
+    db.Text = Text

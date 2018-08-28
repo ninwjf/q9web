@@ -93,14 +93,20 @@ def user_list(community, st = STAT.OPEN):
     ret['houses'] = a
     return ret
 
-def comny_login(community, pwd, st = STAT.OPEN):
+def comny_login(account, pwd, st = STAT.OPEN):
     ''' 小区权限验证 '''
-    i = Community.query.filter(community == Community.communityID, pwd == Community.pwd, st == Community.status).count()
-    return RETURN.SUCC if i > 0 else RETURN.PWDERR
+    comny = db.session.query(Community.communityID, Community.community).filter(account == Community.account, pwd == Community.pwd, st == Community.status).first()
+    if comny:
+        ret = RETURN.SUCC.copy()
+        ret['community'] = comny.communityID
+        ret['communityName'] = comny.community
+    else:
+        ret = RETURN.PWDERR.copy()
+    return ret
 
-def comny_chgPwd(community, pwd, newPwd, st = STAT.OPEN):
+def comny_chgPwd(account, pwd, newPwd, st = STAT.OPEN):
     ''' 小区SIP管理员修改密码 '''
-    user = Community.query.filter(community == Community.communityID, pwd == Community.pwd, st == Community.status).first()
+    user = Community.query.filter(account == Community.account, pwd == Community.pwd, st == Community.status).first()
     if user:
         user.pwd = newPwd
         db.session.commit()

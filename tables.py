@@ -65,8 +65,10 @@ class Community(db.Model):
     __tablename__ = 'community'
     id = db.Column(db.Integer, db.Sequence('cmny_id_seq'), primary_key=True)
     community = db.Column(db.String(100))
-    communityID = db.Column(db.String(5))
+    communityID = db.Column(db.String(10))
+    account = db.Column(db.String(16)) 
     pwd = db.Column(db.String(16))
+    parentAcc = db.Column(db.String(16))
     status = db.Column(db.Integer)
 
 class Monitor(db.Model):
@@ -87,10 +89,10 @@ class Registrations(db.Model):
     reg_user = db.Column(db.String(256), primary_key=True)
     realm = db.Column(db.String(256))
     token = db.Column(db.String(256))
-    #url = db.Column(db.Text)
+    url = db.Column(db.Text)
     expires = db.Column(db.Integer)
     network_ip = db.Column(db.String(256))
     network_port = db.Column(db.String(256))
     network_proto = db.Column(db.String(256))
     hostname = db.Column(db.String(256))
-    #meta_data = Column(String(256))
+    meta_data = db.Column(db.String(256))

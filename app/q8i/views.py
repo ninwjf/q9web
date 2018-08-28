@@ -83,24 +83,24 @@ def houselist():    # 用户列表
     return json.dumps(ret, ensure_ascii=False)
 
 @q8i.route('/login', methods=['GET', 'POST'])
-def login():    # 用户列表
+def login():    # Q8I登陆
     args = request.args if request.method == 'GET' else request.form
     pwd = args.get('pwd', None)
-    community = args.get('comnyID', None)
+    account = args.get('account', None)
 
     ret = RETURN.SYSERR
-    ret = comny_login(community, pwd)
+    ret = comny_login(account, pwd)
     return json.dumps(ret, ensure_ascii=False)
 
 @q8i.route('/chgPwd', methods=['GET', 'POST'])
-def chgpwd():
+def chgpwd():   # Q8I修改密码
     args = request.args if request.method == 'GET' else request.form
     pwd = args.get('pwd', None)
     newPwd = args.get('newPwd', None)
-    community = args.get('comnyID', None)
+    account = args.get('account', None)
 
     ret = RETURN.SYSERR
-    ret = comny_chgPwd(community, pwd, newPwd)
+    ret = comny_chgPwd(account, pwd, newPwd)
     return json.dumps(ret, ensure_ascii=False)
 
 @q8i.route('/sendMsg', methods=['GET', 'POST'])
