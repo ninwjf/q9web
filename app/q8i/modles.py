@@ -65,7 +65,6 @@ def random_pwd(randomlength = 6):
 
 def user_add(comnyID, monitors):
     ''' 批量增加监控设备 '''
-    # 删除小区注册门口机SIP号
     ret = RETURN.SUCC.copy()
     users = User.query.filter(User.phone.like(comnyID + "%") if comnyID is not None else "").all()
     for j in users:
