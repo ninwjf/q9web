@@ -83,3 +83,6 @@ class MyNamespace(Namespace):
 
     def on_disconnect(self):
         print('Client disconnected', request.sid)
+
+def send2Q8i(msgJson):
+    socketio.emit('my_response', msgJson, namespace='/sio_q8i')

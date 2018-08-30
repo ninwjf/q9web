@@ -2,7 +2,9 @@ from flask import render_template, request
 import json
 
 from . import mobile
-from .modles import RETURN, SMSTYPE, user_isExist, sms_send, sms_check, user_registered, user_checkPWD, house_get, monitor_get, user_chgpwd, sms_reqIsRepeat, sms_reqNoTimes, monitor_chk, monitor_open
+from .modles import RETURN, SMSTYPE, sms_send, sms_check, sms_reqIsRepeat, sms_reqNoTimes # 响应消息及短信相关
+from .modles import user_isExist, user_registered, user_checkPWD, user_chgpwd # 用户相关
+from .modles import house_get, monitor_get, monitor_chk, monitor_open, disable_safties #其它
 from config import CONFIG
 
 @mobile.route('/SendSMS', methods=['GET', 'POST'])  # 发送短信验证码
@@ -137,4 +139,25 @@ def Opendoor():
         ret = RETURN.MNITNOEXIT
     else:
         ret = monitor_open(sip)
+    return json.dumps(ret, ensure_ascii=False)
+
+@mobile.route('/DisableSafties', methods=['GET', 'POST'])  # 二维码开锁
+def DisableSafties():
+    args = request.args if request.method == 'GET' else request.form
+    phone = args.get('id', None) 
+    pwd = args.get('pwd', None)
+    addr = args.get('addr', None)
+    time = args.get('time', None)
+    typee = args.get('type', None)
+    action = args.get('action', None)
+
+    ret=RETURN.SYSERR
+    if not (phone and pwd and addr and time and typee and action):    # 参数错误
+        ret = RETURN.PARMERR
+    elif not user_isExist(phone):    # 用户不存在
+        ret = RETURN.NOTEXIST
+    elif not user_checkPWD(phone, pwd):
+        ret = RETURN.PWDERR # 密码错误
+    else:
+        pass
     return json.dumps(ret, ensure_ascii=False)

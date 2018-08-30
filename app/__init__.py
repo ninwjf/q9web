@@ -38,7 +38,7 @@ def create_app():
     from app.mobile import mobile
     from app.freeswitch import freeswitch
     from app.q8i import q8i
-    from app.socketio import sio
+    from app.sioServer import sio
 
     with app.test_request_context():
         db.create_all()

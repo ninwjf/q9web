@@ -8,4 +8,4 @@ from flask import Blueprint
 
 sio = Blueprint('soktio', __name__, template_folder='./templates')
 
-from app.socketio import views
+from app.sioServer import views

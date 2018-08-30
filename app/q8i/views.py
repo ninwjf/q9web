@@ -39,10 +39,11 @@ def MonitorAdd():   # 监控设备关联
     phone = args.get('id', None)
     comnyID = args.get('comnyID', None)
     comnyName = args.get('comnyName', None)
+    devicetype = args.get('devicetype', None)
     site = args.get('site', None)
 
     ret = []
-    monitor_add(phone, comnyID, comnyName, site)
+    monitor_add(phone, comnyID, comnyName, devicetype, site)
     return json.dumps(ret, ensure_ascii=False)
 
 @q8i.route('/MonitorDel', methods=['GET', 'POST'])

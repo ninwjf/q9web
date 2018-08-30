@@ -31,12 +31,13 @@ def house_del(phone, comnyID, site):
     db.session.delete(house)
     db.session.commit()
 
-def monitor_add(phone, comnyID, comnyName, site, st=STAT.OPEN):
+def monitor_add(phone, comnyID, comnyName, devicetype, site, st=STAT.OPEN):
     ''' 添加监控信息 '''
     monitor = Monitor()
     monitor.phone = phone
     monitor.community = comnyName
     monitor.communityID = comnyID
+    monitor.devicetype = devicetype
     monitor.site = site
     monitor.sip = comnyID + site
     monitor.status = st

@@ -1,17 +1,19 @@
 import datetime, random, uuid, json
 
-from tables import db, STAT, User, Sms, MyHouse, Monitor
+from tables import db, STAT, User, Sms, MyHouse, Monitor, DeciveTYPE
 from config import CONFIG
 from dysms_python.demo_sms_send import send_sms
+from app.sioServer.modles import send2Q8i
 
-# 短信类型
 class SMSTYPE():
+    ''' 短信类型 0 注册 1 找回密码'''
     REGT = '0'    # 注册
     PWD = '1'     # 找回密码
 
-# 响应信息
 class RETURN():
+    ''' 响应码，响应信息 '''
     SUCC        = {"Code": "00", "MESSAGE":"交易成功"}
+    REG_SUCC    = {"Code": "00", "MESSAGE":"注册成功"}
     PARMERR     = {"Code": "01", "MESSAGE":"参数错误"}
     SYSERR      = {"Code": "02", "MESSAGE":"系统错误"}
     PHONEERR    = {"Code": "03", "MESSAGE":"非法手机号"}
@@ -38,27 +40,32 @@ def house_get(phone, st=STAT.OPEN):
     return ret
 
 def monitor_open(sip):
-    #二维码开锁，未实现
+    ''' 二维码开锁，未实现 '''
     ret = RETURN.SUCC.copy()
     ret['key'] = sip
     return ret
 
 def monitor_chk(phone, sip):
+    ''' 设备效验 '''
     i = Monitor.query.filter(phone == Monitor.phone, sip == Monitor.sip, STAT.OPEN == Monitor.status).count()
     return i > 0
 
 def monitor_get(phone, st=STAT.OPEN):
     ''' 获取可监控设备列表 '''
-    monit = db.session.query(Monitor.sip, Monitor.communityID, Monitor.community, Monitor.site).filter(phone == Monitor.phone, st == Monitor.status).all()
+    monit = db.session.query(Monitor.sip, Monitor.communityID, Monitor.community, Monitor.devicetype, Monitor.site).filter(phone == Monitor.phone, st == Monitor.status).all()
     a = []
     for i in monit:
-        a.append(i._asdict())
+        b = i._asdict()
+        b['devicetype'] = DeciveTYPE().GetString(b['devicetype'])
+        a.append(b)
+
 
     ret = RETURN.SUCC.copy()
     ret['Monitor'] = a
     return ret
 
 def user_checkPWD(phone, pwd):
+    ''' 验证用户密码 '''
     i = User.query.filter(phone == User.phone, pwd == User.pwd, STAT.OPEN == User.status).count()
     return i > 0
 
@@ -76,10 +83,12 @@ def user_chgpwd(phone, pwd):
     return RETURN.SUCC
 
 def user_registered(phone, pwd):
+    ''' 用户注册 '''
     user_addOrChg(phone, pwd)
-    return RETURN.SUCC
+    return RETURN.REG_SUCC
 
 def user_add(phone, pwd, dt=datetime.datetime.now(), st=STAT.OPEN):
+    ''' 用户添加 '''
     user = User()
     user.phone = phone
     user.pwd = pwd
@@ -89,6 +98,7 @@ def user_add(phone, pwd, dt=datetime.datetime.now(), st=STAT.OPEN):
     db.session.commit()
 
 def user_addOrChg(phone, pwd, dt=datetime.datetime.now(), st=STAT.OPEN):
+    ''' 用户添加或修改 '''
     user = User.query.filter(phone == User.phone).first()
     if user:
         user.pwd = pwd
@@ -164,3 +174,11 @@ def sms_del(expiryTime = CONFIG.SMS_EXPIRY_TIME):
     smsYesterday = Sms.query.filter_by(todaydel > Sms.dtTime).all()
     db.session.delete(smsYesterday)
     db.session.commit()
+
+def disable_safties(phone, addr, time, type, action):
+    ''' 通过SOCKEIO，向管理中心发送撤防指令 '''
+    disbSaftMsg = []
+
+    send2Q8i(disbSaftMsg)
+
+    return RETURN.SUCC
