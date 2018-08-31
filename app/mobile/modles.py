@@ -3,7 +3,7 @@ import datetime, random, uuid, json
 from tables import db, STAT, User, Sms, MyHouse, Monitor, DeciveTYPE
 from config import CONFIG
 from dysms_python.demo_sms_send import send_sms
-from app.sioServer.modles import send2Q8i
+from app.sioServer.modles import send2Q8i, MSGTYPE
 
 class SMSTYPE():
     ''' 短信类型 0 注册 1 找回密码'''
@@ -175,10 +175,15 @@ def sms_del(expiryTime = CONFIG.SMS_EXPIRY_TIME):
     db.session.delete(smsYesterday)
     db.session.commit()
 
-def disable_safties(phone, addr, time, typee, action):
+def disable_safties(phone, addr, time, typee, action, funback = None):
     ''' 通过SOCKEIO，向管理中心发送撤防指令 '''
-    disbSaftMsg = []
+    disbSaftMsg = {
+        "phone": phone,
+        "addr": addr,
+        "time": time,
+        "typee": typee,
+        "action": action
+    }
 
-    send2Q8i(disbSaftMsg)
-
+    send2Q8i(MSGTYPE.Disarm, disbSaftMsg, funback)
     return RETURN.SUCC

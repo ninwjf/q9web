@@ -159,5 +159,8 @@ def DisableSafties():
     elif not user_checkPWD(phone, pwd):
         ret = RETURN.PWDERR # 密码错误
     else:
+        #def funback(status):
+        #    return json.dumps(status, ensure_ascii=False)
+        # 回调中返回结果
         ret = disable_safties(phone, addr, time, typee, action)
     return json.dumps(ret, ensure_ascii=False)

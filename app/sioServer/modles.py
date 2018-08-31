@@ -6,16 +6,25 @@ from app import socketio
 
 q8i_count = 0
 
-def send2Q8i(msgJson):
-    socketio.emit('my_response', msgJson, namespace='/sio_q8i')
+class MSGTYPE():
+    Disarm = "Disarm"   # 撤防
+
+def send2Q8i(msgType, msgJson, func = None):
+    socketio.emit(msgType, msgJson, callback=func, namespace='/sio_q8i')
+    print(msgType, msgJson)
     
 class Q8INamespace(Namespace):
-    #def on_connect(self):
-        #q8i_count += 1
+    def on_connect(self):
+        print("connect", request.sid)
+    
+    def on_disconnect(self):
+        print("disconnect", request.sid)
 
     def on_msg(self, message):
-        emit('msg', message)
+        emit('SevMsg', "message")
+        print("msg:", message)
 
+'''
 thread = None
 thread_lock = Lock()
 def background_thread():
@@ -86,4 +95,4 @@ class MyNamespace(Namespace):
 
     def on_disconnect(self):
         print('Client disconnected', request.sid)
-
+'''
