@@ -14,40 +14,52 @@ class STAT():
         LOCK: u"锁定"
     }
 
+def SiteToName(site, devicetype):
+    if len(site) != 12:
+        return ""
+
+    name = site[0:2] + u"区"
+    if site[2:-8] != "00":
+        name += site[2:4] + u"栋"
+    if site[4:-6] != "00":
+        name += site[4:6] + u"单元"
+    name += DeciveTYPE().GetString(devicetype) + site[-2:]
+    return name
+
 class DeciveTYPE():
-    ControlServer     = 0
+    #ControlServer     = 0
     DoorCamera        = 1
     LabbyPhone        = 2
     Building          = 3
     Wall              = 4
-    IndoorPhone       = 5
-    AdministratorUnit = 6
-    IndoorPhoneSD     = 7
-    MobilePhone       = 8
-    Intercom          = 9
-    IPCamera          = 10
-    GatewaySwitch     = 11
-    CardReader        = 12
-    Other             = 13
+    #IndoorPhone       = 5
+    #AdministratorUnit = 6
+    #IndoorPhoneSD     = 7
+    #MobilePhone       = 8
+    #Intercom          = 9
+    #IPCamera          = 10
+    #GatewaySwitch     = 11
+    #CardReader        = 12
+    #Other             = 13
 
     def GetString(self, devType):
         return self.JS[devType]
 
     JS = {
-        ControlServer:     u"管理中心",
+        #ControlServer:     u"管理中心",
         DoorCamera:        u"别墅机",
-        LabbyPhone:        u"单元门口机",
-        Building:          u"栋门口机",
+        LabbyPhone:        u"门口机", # 单元门口机
+        Building:          u"门口机", # 栋门口机
         Wall:              u"围墙机",
-        IndoorPhone:       u"室内机",
-        AdministratorUnit: u"管理中心机",
-        IndoorPhoneSD:     u"带SD卡的室内机",
-        MobilePhone:       u"手机",
-        Intercom:          u"对讲机",
-        IPCamera:          u"摄像头",
-        GatewaySwitch:     u"数字切换器",
-        CardReader:        u"刷卡器",
-        Other:             u"未知设备"
+        #IndoorPhone:       u"室内机",
+        #AdministratorUnit: u"管理中心机",
+        #IndoorPhoneSD:     u"带SD卡的室内机",
+        #MobilePhone:       u"手机",
+        #Intercom:          u"对讲机",
+        #IPCamera:          u"摄像头",
+        #GatewaySwitch:     u"数字切换器",
+        #CardReader:        u"刷卡器",
+        #Other:             u"未知设备"
     }
 
 class User(db.Model):
@@ -55,6 +67,7 @@ class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, db.Sequence('user_id_seq'), primary_key=True)
     phone = db.Column(db.String(20))
+    usertype = db.Column(db.Integer)
     pwd = db.Column(db.String(16))
     dtTime = db.Column(db.DateTime)
     status = db.Column(db.Integer)
@@ -62,6 +75,7 @@ class User(db.Model):
     def json2user(self, json):
         self.phone = json['Phone']
         self.pwd = json['Pwd']
+        self.usertype = json['devicetype']
         self.dtTime = json['DtTime']
         self.status = json['Status']
         return self
@@ -70,6 +84,7 @@ class User(db.Model):
         return {
             "Phone": self.phone,
             "Pwd": self.pwd,
+            "devicetype": self.usertype,
             "DtTime": self.dtTime,
             "Status": self.status
         }
@@ -124,7 +139,6 @@ class Monitor(db.Model):
     site = db.Column(db.String(15))
     sip = db.Column(db.String(20))
     status = db.Column(db.Integer)
-
 
 ############# freeswitch #######################
 class Registrations():

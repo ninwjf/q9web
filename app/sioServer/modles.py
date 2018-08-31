@@ -6,6 +6,9 @@ from app import socketio
 
 q8i_count = 0
 
+def send2Q8i(msgJson):
+    socketio.emit('my_response', msgJson, namespace='/sio_q8i')
+    
 class Q8INamespace(Namespace):
     #def on_connect(self):
         #q8i_count += 1
@@ -84,5 +87,3 @@ class MyNamespace(Namespace):
     def on_disconnect(self):
         print('Client disconnected', request.sid)
 
-def send2Q8i(msgJson):
-    socketio.emit('my_response', msgJson, namespace='/sio_q8i')

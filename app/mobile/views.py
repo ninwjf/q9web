@@ -159,5 +159,5 @@ def DisableSafties():
     elif not user_checkPWD(phone, pwd):
         ret = RETURN.PWDERR # 密码错误
     else:
-        pass
+        ret = disable_safties(phone, addr, time, typee, action)
     return json.dumps(ret, ensure_ascii=False)

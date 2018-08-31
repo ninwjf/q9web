@@ -10,8 +10,8 @@ def fsuser():   # 用户登陆
     user = args.get('user', None)
     domain = args.get('domain', None)
 
-    pwd =  user_getPWD(user)
-    return render_template("user.html", domain = domain, user = user, pwd = pwd)
+    pwd, name =  user_getPWD(user)
+    return render_template("user.html", domain = domain, user = user, pwd = pwd, name = name)
 
 
 @freeswitch.route('/fsplan', methods=['GET', 'POST'])

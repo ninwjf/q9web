@@ -175,7 +175,7 @@ def sms_del(expiryTime = CONFIG.SMS_EXPIRY_TIME):
     db.session.delete(smsYesterday)
     db.session.commit()
 
-def disable_safties(phone, addr, time, type, action):
+def disable_safties(phone, addr, time, typee, action):
     ''' 通过SOCKEIO，向管理中心发送撤防指令 '''
     disbSaftMsg = []
 
