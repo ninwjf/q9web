@@ -22,6 +22,7 @@ def house_add(phone, comnyID, comnyName, site, st=STAT.OPEN):
     house.status = st
     db.session.add(house)
     db.session.commit()
+    return RETURN.SUCC
 
 def house_del(phone, comnyID, site):
     ''' 删除住宅信息 '''
@@ -30,6 +31,7 @@ def house_del(phone, comnyID, site):
         return 
     db.session.delete(house)
     db.session.commit()
+    return RETURN.SUCC
 
 def monitor_add(phone, comnyID, comnyName, devicetype, site, st=STAT.OPEN):
     ''' 添加监控信息 '''
@@ -43,6 +45,7 @@ def monitor_add(phone, comnyID, comnyName, devicetype, site, st=STAT.OPEN):
     monitor.status = st
     db.session.add(monitor)
     db.session.commit()
+    return RETURN.SUCC
 
 def monitor_del(phone, comnyID, site):
     ''' 删除监控信息 '''
@@ -51,6 +54,7 @@ def monitor_del(phone, comnyID, site):
         return 
     db.session.delete(monitor)
     db.session.commit()
+    return RETURN.SUCC
 
 def random_pwd(randomlength = 6):
     '''生成一个指定长度的随机数字字符串'''

@@ -17,8 +17,8 @@ def myhouseAdd():   # 住宅关联
     comnyName = args.get('comnyName', None)
     site = args.get('site', None)
     
-    ret = []
-    house_add(phone, comnyID, comnyName, site)
+    ret = RETURN.SYSERR.copy()
+    ret = house_add(phone, comnyID, comnyName, site)
     return json.dumps(ret, ensure_ascii=False)
 
 @q8i.route('/MyhouseDel', methods=['GET', 'POST'])
@@ -28,8 +28,8 @@ def myhouseDel():   # 住宅取关
     comnyID = args.get('comnyID', None)
     site = args.get('site', None)
 
-    ret = []
-    house_del(phone, comnyID, site)
+    ret = RETURN.SYSERR.copy()
+    ret = house_del(phone, comnyID, site)
     return json.dumps(ret, ensure_ascii=False)
 
 @q8i.route('/MonitorAdd', methods=['GET', 'POST'])
@@ -41,8 +41,8 @@ def MonitorAdd():   # 监控设备关联
     devicetype = args.get('devicetype', None)
     site = args.get('site', None)
 
-    ret = []
-    monitor_add(phone, comnyID, comnyName, devicetype, site)
+    ret = RETURN.SYSERR.copy()
+    ret = monitor_add(phone, comnyID, comnyName, devicetype, site)
     return json.dumps(ret, ensure_ascii=False)
 
 @q8i.route('/MonitorDel', methods=['GET', 'POST'])
@@ -52,8 +52,8 @@ def MonitorDel():   # 监控设备取关
     comnyID = args.get('comnyID', None)
     site = args.get('site', None)
 
-    ret = []
-    monitor_del(phone, comnyID, site)
+    ret = RETURN.SYSERR.copy()
+    ret = monitor_del(phone, comnyID, site)
     return json.dumps(ret, ensure_ascii=False)
 
 @q8i.route('/Monitor2SIP', methods=['GET', 'POST'])

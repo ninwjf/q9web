@@ -2,7 +2,7 @@ from tables import db, STAT, User, MyHouse, Registrations, Monitor, SiteToName
 
 def user_getPWD(phone):
     i = db.session.query(User.phone, User.pwd, User.usertype).filter(phone == User.phone, STAT.OPEN == User.status).first()
-    return i.pwd, SiteToName(i.phone[8:], i.usertype) if i else None
+    return i.pwd if i else None, SiteToName(i.phone[8:], i.usertype) if i else None
     
 def phones_get(sip, st=STAT.OPEN):
     ''' 获取呼叫列表 '''
