@@ -64,7 +64,7 @@ class DeciveTYPE():
 
 class User(db.Model):
     ''' fs用户信息表 包含手机APP用户 以及 小区设备'''
-    __tablename__ = 'fs_user'
+    __tablename__ = 'web_user'
     id = db.Column(db.Integer, db.Sequence('user_id_seq'), primary_key=True)
     phone = db.Column(db.String(25))    # 电话号码或者设备SIP号
     usertype = db.Column(db.Integer)
@@ -94,7 +94,7 @@ class User(db.Model):
 
 class Sms(db.Model):
     ''' 短信验证码表 '''
-    __tablename__ = 'fs_sms'
+    __tablename__ = 'web_sms'
     id = db.Column(db.Integer, db.Sequence('sms_id_seq'), primary_key=True)
     phone = db.Column(db.String(20)) 
     code = db.Column(db.String(6))
@@ -105,7 +105,7 @@ class Sms(db.Model):
 
 class MyHouse(db.Model):
     ''' 我的住宅 '''
-    __tablename__ = 'fs_myhouse'
+    __tablename__ = 'web_myhouse'
     id = db.Column(db.Integer, db.Sequence('house_id_seq'), primary_key=True)
     phone = db.Column(db.String(20))
     name = db.Column(db.String(100))
@@ -122,7 +122,7 @@ class MyHouse(db.Model):
 
 class Community(db.Model):
     ''' 小区 '''
-    __tablename__ = 'fs_community'
+    __tablename__ = 'web_community'
     id = db.Column(db.Integer, db.Sequence('cmny_id_seq'), primary_key=True)
     community = db.Column(db.String(100))
     communityID = db.Column(db.String(10))
@@ -133,7 +133,7 @@ class Community(db.Model):
 
 class Monitor(db.Model):
     ''' 监控设备列表 '''
-    __tablename__ = 'fs_monitor'
+    __tablename__ = 'web_monitor'
     id = db.Column(db.Integer, db.Sequence('monitr_id_seq'), primary_key=True)
     phone = db.Column(db.String(20))
     community = db.Column(db.String(100))
