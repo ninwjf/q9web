@@ -5,9 +5,8 @@ from flask_socketio import send, emit
 #from app import socketio
 from . import q8i
 from .modles import RETURN, fs_sendChat
-from .modles import house_add, house_del
-from .modles import monitor_add, monitor_del
-from .modles import user_add, user_list
+from .modles import house_add, house_del, house_list
+from .modles import monitor_add, monitor_del, monitor_list, user_add
 from .modles import comny_login, comny_chgPwd  
 
 @q8i.route('/MyhouseAdd', methods=['GET', 'POST'])
@@ -63,15 +62,14 @@ def Monitor():  # 监控设备 添加 SIP账号
 
     ret = user_add(data['comnyID'], data['Monitors'])
     return json.dumps(ret, ensure_ascii=False)
-
-@q8i.route('/warn', methods=['GET', 'POST'])
-def warn():     # 安防信息批量推送
-    #args = request.args if request.method == 'GET' else request.form
-    #room = args.get('room', None)
-
-    data = json.loads(request.get_data())
-    ret = data['warn']
     
+@q8i.route('/MonitorList', methods=['GET', 'POST'])
+def MonitorList():  # 监控设备 添加 SIP账号
+    args = request.args if request.method == 'GET' else request.form
+    community = args.get('community', None)
+
+    ret = RETURN.SYSERR
+    ret = monitor_list(community)
     return json.dumps(ret, ensure_ascii=False)
 
 @q8i.route('/houselist', methods=['GET', 'POST'])
@@ -80,7 +78,7 @@ def houselist():    # 用户列表
     community = args.get('community', None)
 
     ret = RETURN.SYSERR
-    ret = user_list(community)
+    ret = house_list(community)
     return json.dumps(ret, ensure_ascii=False)
 
 @q8i.route('/login', methods=['GET', 'POST'])
@@ -112,19 +110,7 @@ def sendMsg():
     msgDir = args.get('msgDir', None)
 
     ret = RETURN.SYSERR
-    if msgDir:
-        ret = fs_sendChat(community, msgTxt, msgDir)
-    else:
-        pass
-    #ret = comny_chgPwd(community, pwd, newPwd)
+    if not (msgDir and community and msgTxt):    # 参数错误
+        ret = RETURN.PARMERR
+    ret = fs_sendChat(community, msgTxt, msgDir)
     return json.dumps(ret, ensure_ascii=False)
-
-# @socketio.on('connect')
-# def connect():
-#    """ 服务器发送通信请求 """
-#    pass
-#
-#
-#@socketio.on('connect_event')
-#def refresh_message(msg):
-#    emit('server_response', {'data': msg['data']})

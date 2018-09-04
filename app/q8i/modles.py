@@ -82,8 +82,19 @@ def user_add(comnyID, monitors):
     db.session.commit()
     return ret
 
-def user_list(community, st = STAT.OPEN):
-    ''' 获取小区用户列表 '''
+def monitor_list(community, st = STAT.OPEN):
+    ''' 获取小区设备列表 '''
+    monitors = db.session.query(User.site).filter(community == User.communityID, st == User.status).all()
+    a = []
+    for i in monitors:
+        a.append(i._asdict())
+
+    ret = RETURN.SUCC.copy()
+    ret['monitor'] = a
+    return ret
+
+def house_list(community, st = STAT.OPEN):
+    ''' 获取小区房间列表 '''
     houses = db.session.query(MyHouse.phone, MyHouse.site).filter(community == MyHouse.communityID, st == MyHouse.status).all()
     a = []
     for i in houses:

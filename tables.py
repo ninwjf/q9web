@@ -64,9 +64,9 @@ class DeciveTYPE():
 
 class User(db.Model):
     ''' fs用户信息表 包含手机APP用户 以及 小区设备'''
-    __tablename__ = 'user'
+    __tablename__ = 'fs_user'
     id = db.Column(db.Integer, db.Sequence('user_id_seq'), primary_key=True)
-    phone = db.Column(db.String(20))
+    phone = db.Column(db.String(25))    # 电话号码或者设备SIP号
     usertype = db.Column(db.Integer)
     pwd = db.Column(db.String(16))
     dtTime = db.Column(db.DateTime)
@@ -84,7 +84,7 @@ class User(db.Model):
         return {
             "Phone": self.phone,
             "Pwd": self.pwd,
-            "devicetype": self.usertype,
+            "Devicetype": self.usertype,
             "DtTime": self.dtTime,
             "Status": self.status
         }
@@ -94,7 +94,7 @@ class User(db.Model):
 
 class Sms(db.Model):
     ''' 短信验证码表 '''
-    __tablename__ = 'sms'
+    __tablename__ = 'fs_sms'
     id = db.Column(db.Integer, db.Sequence('sms_id_seq'), primary_key=True)
     phone = db.Column(db.String(20)) 
     code = db.Column(db.String(6))
@@ -105,13 +105,16 @@ class Sms(db.Model):
 
 class MyHouse(db.Model):
     ''' 我的住宅 '''
-    __tablename__ = 'myhouse'
+    __tablename__ = 'fs_myhouse'
     id = db.Column(db.Integer, db.Sequence('house_id_seq'), primary_key=True)
     phone = db.Column(db.String(20))
+    name = db.Column(db.String(100))
+    sex = db.Column(db.Integer)
+    uType = db.Column(db.Integer)
     community = db.Column(db.String(100))
     communityID = db.Column(db.String(10))
     site = db.Column(db.String(15))
-    sip = db.Column(db.String(20))      # 虚拟SIP号
+    sip = db.Column(db.String(25))      # 虚拟SIP号
     status = db.Column(db.Integer)
 
     def __repr__(self):
@@ -119,7 +122,7 @@ class MyHouse(db.Model):
 
 class Community(db.Model):
     ''' 小区 '''
-    __tablename__ = 'community'
+    __tablename__ = 'fs_community'
     id = db.Column(db.Integer, db.Sequence('cmny_id_seq'), primary_key=True)
     community = db.Column(db.String(100))
     communityID = db.Column(db.String(10))
@@ -130,14 +133,14 @@ class Community(db.Model):
 
 class Monitor(db.Model):
     ''' 监控设备列表 '''
-    __tablename__ = 'monitor'
+    __tablename__ = 'fs_monitor'
     id = db.Column(db.Integer, db.Sequence('monitr_id_seq'), primary_key=True)
     phone = db.Column(db.String(20))
     community = db.Column(db.String(100))
     communityID = db.Column(db.String(10))
     devicetype = db.Column(db.Integer)
     site = db.Column(db.String(15))
-    sip = db.Column(db.String(20))
+    sip = db.Column(db.String(25))
     status = db.Column(db.Integer)
 
 ############# freeswitch #######################
