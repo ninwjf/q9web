@@ -75,7 +75,7 @@ class User(db.Model):
     def json2user(self, json):
         self.phone = json['Phone']
         self.pwd = json['Pwd']
-        self.usertype = json['devicetype']
+        self.usertype = json['Devicetype']
         self.dtTime = json['DtTime']
         self.status = json['Status']
         return self
