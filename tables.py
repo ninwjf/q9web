@@ -144,7 +144,7 @@ class Monitor(db.Model):
     status = db.Column(db.Integer)
 
 ############# freeswitch #######################
-class Registrations():
+class Registrations(db.Model):
     __tablename__ = 'registrations'
     reg_user = db.Column(db.String(256), primary_key=True)
     realm = db.Column(db.String(256))
@@ -155,4 +155,4 @@ class Registrations():
     network_port = db.Column(db.String(256))
     network_proto = db.Column(db.String(256))
     hostname = db.Column(db.String(256))
-    meta_data = db.Column(db.String(256))
+    #metadata = db.Column(db.String(256))
