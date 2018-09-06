@@ -28,5 +28,5 @@ debug = False
 
 bind = "%s:%s" % ("0.0.0.0", 8811)
 pidfile = '%s/run/%s.pid' % (path_of_current_dir, _file_name)
-errorlog = '%s/logs/%s_error.log' % (path_of_current_dir, _file_name)
-accesslog = '%s/logs/%s_access.log' % (path_of_current_dir, _file_name)
+errorlog = '%s/log/%s_error.log' % (path_of_current_dir, _file_name)
+accesslog = '%s/log/%s_access.log' % (path_of_current_dir, _file_name)
