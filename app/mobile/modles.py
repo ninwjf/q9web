@@ -1,6 +1,6 @@
 import datetime, random, uuid, json
 
-from tables import db, STAT, User, Sms, MyHouse, Monitor, DeciveTYPE
+from tables import db, STAT, User, Sms, MyHouse, Monitor, DeciveTYPE, SiteToName
 from config import CONFIG
 from dysms_python.demo_sms_send import send_sms
 from app.sioServer.modles import send2Q8i, MSGTYPE
@@ -56,6 +56,7 @@ def monitor_get(phone, st=STAT.OPEN):
     a = []
     for i in monit:
         b = i._asdict()
+        b['deviceName'] = SiteToName(b['site'], b['devicetype'])
         b['devicetype'] = DeciveTYPE().GetString(b['devicetype'])
         a.append(b)
 
