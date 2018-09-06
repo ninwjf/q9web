@@ -5,7 +5,7 @@ import multiprocessing
 path_of_current_file = os.path.abspath(__file__)
 path_of_current_dir = os.path.split(path_of_current_file)[0]
 
-_file_name = os.path.basename(__file__)
+_file_name = 'gunicorn'
 
 sys.path.insert(0, path_of_current_dir)
 
@@ -27,6 +27,6 @@ debug = False
 
 
 bind = "%s:%s" % ("0.0.0.0", 8811)
-pidfile = '%s/run/%s.pid' % (path_of_current_dir, _file_name)
-errorlog = '%s/log/%s_error.log' % (path_of_current_dir, _file_name)
-accesslog = '%s/log/%s_access.log' % (path_of_current_dir, _file_name)
+pidfile = '~/run/%s.pid' % (path_of_current_dir, _file_name)
+errorlog = '~/log/%s_error.log' % (path_of_current_dir, _file_name)
+accesslog = '~/log/%s_access.log' % (path_of_current_dir, _file_name)
