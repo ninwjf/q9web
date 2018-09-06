@@ -18,7 +18,6 @@ worker_connections = 1000
 timeout = 30
 max_requests = 2000
 graceful_timeout = 30
-worker_class='geventwebsocket.gunicorn.workers.GeventWebSocketWorker'
 
 loglevel = 'info'
 
