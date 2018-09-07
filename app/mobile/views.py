@@ -150,9 +150,11 @@ def DisableSafties():
     time = args.get('time', None)
     typee = args.get('type', None)
     action = args.get('action', None)
+    communityID = args.get('communityID', None)
+    communityName = args.get('communityName', None)
 
     ret=RETURN.SYSERR
-    if not (phone and pwd and addr and time and typee and action):    # 参数错误
+    if not (phone and pwd and addr and time and typee and action and communityID):    # 参数错误
         ret = RETURN.PARMERR
     elif not user_isExist(phone):    # 用户不存在
         ret = RETURN.NOTEXIST
@@ -162,5 +164,5 @@ def DisableSafties():
         #def funback(status):
         #    return json.dumps(status, ensure_ascii=False)
         # 回调中返回结果
-        ret = disable_safties(phone, addr, time, typee, action)
+        ret = disable_safties(phone, communityID, communityName, addr, time, typee, action)
     return json.dumps(ret, ensure_ascii=False)

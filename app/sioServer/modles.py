@@ -10,8 +10,9 @@ class MSGTYPE():
     Disarm = "Disarm"   # 撤防
 
 def send2Q8i(msgType, msgJson, func = None):
-    socketio.emit(msgType, msgJson, callback=func, namespace='/sio_q8i')
-    print(msgType, msgJson)
+    if msgJson['communityID']:
+        socketio.emit(msgType, msgJson, room=msgJson['communityID'], callback=func, namespace='/sio_q8i')
+        print(msgType, msgJson)
     
 class Q8INamespace(Namespace):
     def on_connect(self):
@@ -20,9 +21,29 @@ class Q8INamespace(Namespace):
     def on_disconnect(self):
         print("disconnect", request.sid)
 
+        
+    def on_error(self):
+        print("disconnect", request.sid)
+
     def on_msg(self, message):
-        emit('SevMsg', "message")
+        emit('SevMsg', message)
         print("msg:", message)
+
+    def on_JoinRoom(self, message):
+        join_room(message['communityID'])
+        print("JoinRoom:", message)
+
+    def on_LeaveRoom(self, message):
+        leave_room(message['communityID'])
+        print("LeaveRoom:", message)
+
+    def on_CloseRoom(self, message):
+        close_room(message['communityID'])
+        print("CloseRoom:", message)
+
+    def on_MsgToRoom(self, message):
+        print("EventRoom:", message)
+        emit('SevMsg', message, room=message['communityID'])
 
 '''
 thread = None
