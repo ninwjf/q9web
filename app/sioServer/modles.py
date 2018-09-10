@@ -21,14 +21,10 @@ class Q8INamespace(Namespace):
     def on_disconnect(self):
         print("disconnect", request.sid)
 
-        
     def on_error(self):
         print("disconnect", request.sid)
 
-    def on_msg(self, message):
-        emit('SevMsg', message)
-        print("msg:", message)
-
+    # 房间
     def on_JoinRoom(self, message):
         join_room(message['communityID'])
         print("JoinRoom:", message)
@@ -41,9 +37,23 @@ class Q8INamespace(Namespace):
         close_room(message['communityID'])
         print("CloseRoom:", message)
 
+    # 发送消息部分
+    def on_msg(self, message):
+        emit('SevMsg', message)
+        print("msg:", message)
+
+    def on_broadcast_msg(self, message):
+        emit('SevMsg', message, broadcast=True)
+        print("broadcast msg:", message)
+
     def on_MsgToRoom(self, message):
-        print("EventRoom:", message)
+        print("MsgToRoom:", message)
         emit('SevMsg', message, room=message['communityID'])
+
+    def on_RoomList(self):
+        roomList = rooms()
+        emit('SevMsg', roomList)
+        print("rooms:", roomList)
 
 '''
 thread = None

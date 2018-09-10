@@ -17,7 +17,8 @@
             // The connection URL has the following format:
             //     http[s]://<domain>:<port>[/<namespace>]
             //var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-            var socket = io.connect('http://120.79.92.166:80/sio_q8i');
+            //var socket = io.connect('http://120.79.92.166:80/sio_q8i');
+            var  socket = io.connect('http://127.0.0.1:5000/sio_q8i');
 
             // Event handler for new connections.
             // The callback function is invoked when a connection with the
@@ -38,7 +39,7 @@
             // to the client. The data is then displayed in the "Received"
             // section of the page.
             socket.on('SevMsg', function(msg) {
-                $('#log').append('<br>' + $('<div/>').text('SevMsg Received #').html());
+                $('#log').append('<br>' + $('<div/>').text('SevMsg Received # ' + JSON.stringify(msg)).html());
             });
 
             // Interval function that tests message latency by sending a "ping"
@@ -68,11 +69,11 @@
             // These accept data from the user and send it to the server in a
             // variety of ways
             $('form#emit').submit(function(event) {
-                socket = io.connect('http://127.0.0.1:5000/sio_q8i');
+                socket.emit('msg', {data: $('#emit_data').val()});
                 return false;
             });
             $('form#broadcast').submit(function(event) {
-                socket.emit('msg', {data: $('#broadcast_data').val()});
+                socket.emit('broadcast_msg', {data: $('#broadcast_data').val()});
                 return false;
             });
             $('form#join').submit(function(event) {
@@ -85,6 +86,10 @@
             });
             $('form#send_room').submit(function(event) {
                 socket.emit('MsgToRoom', {communityID: $('#room_name').val(), data: $('#room_data').val()});
+                return false;
+            });
+            $('form#RoomList').submit(function(event) {
+                socket.emit('RoomList');
                 return false;
             });
             $('form#close').submit(function(event) {
@@ -123,6 +128,9 @@
         <input type="text" name="room_name" id="room_name" placeholder="Room Name">
         <input type="text" name="room_data" id="room_data" placeholder="Message">
         <input type="submit" value="Send to Room">
+    </form>
+    <form id="RoomList" method="POST" action="#">
+        <input type="submit" value="List Room">
     </form>
     <form id="close" method="POST" action="#">
         <input type="text" name="close_room" id="close_room" placeholder="Room Name">
