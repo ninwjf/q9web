@@ -111,6 +111,7 @@ class MyHouse(db.Model):
     name = db.Column(db.String(100))
     sex = db.Column(db.Integer)
     uType = db.Column(db.Integer)
+    dType = db.Column(db.Integer)
     community = db.Column(db.String(100))
     communityID = db.Column(db.String(10))
     site = db.Column(db.String(15))

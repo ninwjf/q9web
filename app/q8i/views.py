@@ -5,66 +5,19 @@ from flask_socketio import send, emit
 #from app import socketio
 from . import q8i
 from .modles import RETURN, fs_sendChat
-from .modles import house_add, house_del, house_list
-from .modles import monitor_add, monitor_del, monitor_list, user_add
+from .modles import house_list, house_Join, house_UnJoin, monitor_list, user_add
 from .modles import comny_login, comny_chgPwd  
 
-@q8i.route('/MyhouseAdd', methods=['GET', 'POST'])
-def myhouseAdd():   # 住宅关联
-    args = request.args if request.method == 'GET' else request.form
-    phone = args.get('id', None)
-    comnyID = args.get('comnyID', None)
-    comnyName = args.get('comnyName', None)
-    site = args.get('site', None)
-    
-    ret = RETURN.SYSERR.copy()
-    ret = house_add(phone, comnyID, comnyName, site)
-    return json.dumps(ret, ensure_ascii=False)
-
-@q8i.route('/MyhouseDel', methods=['GET', 'POST'])
-def myhouseDel():   # 住宅取关
-    args = request.args if request.method == 'GET' else request.form
-    phone = args.get('id', None)
-    comnyID = args.get('comnyID', None)
-    site = args.get('site', None)
-
-    ret = RETURN.SYSERR.copy()
-    ret = house_del(phone, comnyID, site)
-    return json.dumps(ret, ensure_ascii=False)
-
-@q8i.route('/MonitorAdd', methods=['GET', 'POST'])
-def MonitorAdd():   # 监控设备关联
-    args = request.args if request.method == 'GET' else request.form
-    phone = args.get('id', None)
-    comnyID = args.get('comnyID', None)
-    comnyName = args.get('comnyName', None)
-    devicetype = args.get('devicetype', None)
-    site = args.get('site', None)
-
-    ret = RETURN.SYSERR.copy()
-    ret = monitor_add(phone, comnyID, comnyName, devicetype, site)
-    return json.dumps(ret, ensure_ascii=False)
-
-@q8i.route('/MonitorDel', methods=['GET', 'POST'])
-def MonitorDel():   # 监控设备取关
-    args = request.args if request.method == 'GET' else request.form
-    phone = args.get('id', None)
-    comnyID = args.get('comnyID', None)
-    site = args.get('site', None)
-
-    ret = RETURN.SYSERR.copy()
-    ret = monitor_del(phone, comnyID, site)
-    return json.dumps(ret, ensure_ascii=False)
 
 @q8i.route('/Monitor2SIP', methods=['GET', 'POST'])
 def Monitor():  # 监控设备 添加 SIP账号
     data = json.loads(request.get_data())
 
-    ret = user_add(data['comnyID'], data['Monitors'])
+    ret = user_add(data['Monitors'])
     return json.dumps(ret, ensure_ascii=False)
     
 @q8i.route('/MonitorList', methods=['GET', 'POST'])
-def MonitorList():  # 监控设备 添加 SIP账号
+def MonitorList():  # 监控设备列表
     args = request.args if request.method == 'GET' else request.form
     community = args.get('community', None)
 
@@ -87,7 +40,7 @@ def login():    # Q8I登陆
     pwd = args.get('pwd', None)
     account = args.get('account', None)
 
-    ret = RETURN.SYSERR
+    ret = RETURN.SYSERR 
     ret = comny_login(account, pwd)
     return json.dumps(ret, ensure_ascii=False)
 
@@ -103,7 +56,7 @@ def chgpwd():   # Q8I修改密码
     return json.dumps(ret, ensure_ascii=False)
 
 @q8i.route('/sendMsg', methods=['GET', 'POST'])
-def sendMsg():
+def sendMsg(): # 发送短信
     args = request.args if request.method == 'GET' else request.form
     msgTxt = args.get('msgTxt', None)
     community = args.get('comnyID', None)
@@ -114,3 +67,68 @@ def sendMsg():
         ret = RETURN.PARMERR
     ret = fs_sendChat(community, msgTxt, msgDir)
     return json.dumps(ret, ensure_ascii=False)
+
+@q8i.route('/HouseJoin', methods=['GET', 'POST'])
+def HouseJoin():
+    data = json.loads(request.get_data())
+
+    ret = RETURN.SYSERR
+    ret = house_Join(data['comnyID'], data['community'], data['Houses'], data['Monitors'])
+    return json.dumps(ret, ensure_ascii=False)
+
+@q8i.route('/HouseUnJoin', methods=['GET', 'POST'])
+def HouseUnJoin():
+    data = json.loads(request.get_data())
+
+    ret = RETURN.SYSERR
+    ret = house_UnJoin(data['comnyID'], data['community'], data['Houses'])
+    return json.dumps(ret, ensure_ascii=False)
+
+################################# 单个添加弃用 ######################################
+# 
+# @q8i.route('/MyhouseAdd', methods=['GET', 'POST'])
+# def myhouseAdd():   # 住宅关联
+#     args = request.args if request.method == 'GET' else request.form
+#     phone = args.get('id', None)
+#     comnyID = args.get('comnyID', None)
+#     comnyName = args.get('comnyName', None)
+#     site = args.get('site', None)
+#     
+#     ret = RETURN.SYSERR.copy()
+#     ret = house_add(phone, comnyID, comnyName, site)
+#     return json.dumps(ret, ensure_ascii=False)
+# 
+# @q8i.route('/MyhouseDel', methods=['GET', 'POST'])
+# def myhouseDel():   # 住宅取关
+#     args = request.args if request.method == 'GET' else request.form
+#     phone = args.get('id', None)
+#     comnyID = args.get('comnyID', None)
+#     site = args.get('site', None)
+# 
+#     ret = RETURN.SYSERR.copy()
+#     ret = house_del(phone, comnyID, site)
+#     return json.dumps(ret, ensure_ascii=False)
+# 
+# @q8i.route('/MonitorAdd', methods=['GET', 'POST'])
+# def MonitorAdd():   # 监控设备关联
+#     args = request.args if request.method == 'GET' else request.form
+#     phone = args.get('id', None)
+#     comnyID = args.get('comnyID', None)
+#     comnyName = args.get('comnyName', None)
+#     devicetype = args.get('devicetype', None)
+#     site = args.get('site', None)
+# 
+#     ret = RETURN.SYSERR.copy()
+#     ret = monitor_add(phone, comnyID, comnyName, devicetype, site)
+#     return json.dumps(ret, ensure_ascii=False)
+# 
+# @q8i.route('/MonitorDel', methods=['GET', 'POST'])
+# def MonitorDel():   # 监控设备取关
+#     args = request.args if request.method == 'GET' else request.form
+#     phone = args.get('id', None)
+#     comnyID = args.get('comnyID', None)
+#     site = args.get('site', None)
+# 
+#     ret = RETURN.SYSERR.copy()
+#     ret = monitor_del(phone, comnyID, site)
+#     return json.dumps(ret, ensure_ascii=False)

@@ -11,50 +11,6 @@ class RETURN():
     COMNYERR    = {"Code": "03", "MESSAGE":"小区不存在"}
     PWDERR      = {"Code": "04", "MESSAGE":"密码错误"}
 
-def house_add(phone, comnyID, comnyName, site, st=STAT.OPEN):
-    ''' 添加住宅信息 '''
-    house = MyHouse()
-    house.phone = phone
-    house.community = comnyName
-    house.communityID = comnyID
-    house.site = site
-    house.sip = comnyID + site
-    house.status = st
-    db.session.add(house)
-    db.session.commit()
-    return RETURN.SUCC
-
-def house_del(phone, comnyID, site):
-    ''' 删除住宅信息 '''
-    house = MyHouse.query.filter(phone == MyHouse.phone, comnyID == MyHouse.communityID, site == MyHouse.site).first()
-    if house is None:
-        return 
-    db.session.delete(house)
-    db.session.commit()
-    return RETURN.SUCC
-
-def monitor_add(phone, comnyID, comnyName, devicetype, site, st=STAT.OPEN):
-    ''' 添加监控信息 '''
-    monitor = Monitor()
-    monitor.phone = phone
-    monitor.community = comnyName
-    monitor.communityID = comnyID
-    monitor.devicetype = devicetype
-    monitor.site = site
-    monitor.sip = comnyID + site
-    monitor.status = st
-    db.session.add(monitor)
-    db.session.commit()
-    return RETURN.SUCC
-
-def monitor_del(phone, comnyID, site):
-    ''' 删除监控信息 '''
-    monitor = Monitor.query.filter(phone == Monitor.phone, comnyID == Monitor.communityID, site == Monitor.site).first()
-    if monitor is None:
-        return 
-    db.session.delete(monitor)
-    db.session.commit()
-    return RETURN.SUCC
 
 def random_pwd(randomlength = 6):
     '''生成一个指定长度的随机数字字符串'''
@@ -67,17 +23,15 @@ def random_pwd(randomlength = 6):
         random_str += base_str[random.randint(0, length)]
     return random_str
 
-def user_add(comnyID, monitors):
+def user_add(monitors):
     ''' 批量增加监控设备 '''
-    ret = RETURN.SUCC.copy()
-    users = User.query.filter(User.phone.like(comnyID + "%") if comnyID is not None else "").all()
-    for j in users:
-        db.session.delete(j)
-
     ret = RETURN.SUCC.copy()
     js = json.loads(monitors)
     monitor = []
     for i in  js:
+        userdel = User.query.filter(User.phone == i['Phone']).first()
+        if userdel:
+            db.session.delete(userdel)
         user = User().json2user(i)
         user.pwd = random_pwd()
         db.session.add(user)
@@ -141,3 +95,105 @@ def fs_sendChat(community, msg, dir, st = STAT.OPEN):
 
     ret = RETURN.SUCC.copy()
     return ret
+
+def house_Join(community, communityName, households, monitors, st =STAT.OPEN):
+    jshouseholds = json.loads(households)
+    jsmonitors = json.loads(monitors)
+    for household in jshouseholds:
+        # 关联住户信息
+        house = MyHouse()
+        house.phone = household['Phone']
+        house.name = household['Name']
+        house.sex = household['Sex']
+        house.uType = household['UType']
+        house.community = communityName
+        house.communityID = community
+        house.site = household['Site']
+        house.sip = community + household['Site']
+        house.status = st
+        db.session.add(house)
+        # 关联设备信息
+        for monitor in jsmonitors:
+            len = monitor['Site'].find('00')
+            if len == -1: 
+                len = monitor['Site'].length -2
+
+            # 区栋单元一致
+            if monitor['Site'][0:len] == household['Site'][0:len]:
+                montr = Monitor()
+                montr.phone = household['Phone']
+                montr.community = communityName
+                montr.communityID = community
+                montr.devicetype = monitor['Devicetype']
+                montr.site = monitor['Site']
+                montr.sip = community + monitor['Site']
+                montr.status = st
+                db.session.add(montr)
+    db.session.commit()
+    ret = RETURN.SUCC.copy()
+    return ret
+
+def house_UnJoin(community, communityName, households, st =STAT.OPEN):
+    jshouseholds = json.loads(households)
+    for h in jshouseholds:
+        house = MyHouse.query.filter(h['Phone'] == MyHouse.phone, community == MyHouse.communityID, h['Site'] == MyHouse.site).first()
+        db.session.delete(house)
+        montr = Monitor.query.filter(h['Phone'] == Monitor.phone, community == Monitor.communityID).all()
+        for i in montr:
+            len = i.site.find('00')
+            if len == -1: 
+                len = i.site.length -2
+
+            # 区栋单元一致
+            if h['Site'][0:len] == i.site[0:len]:
+                db.session.delete(i)
+    db.session.commit()
+    ret = RETURN.SUCC.copy()
+    return ret
+
+################################# 单个添加弃用 ######################################
+#
+#	def house_add(phone, comnyID, comnyName, site, st=STAT.OPEN):
+#	    ''' 添加住宅信息 '''
+#	    house = MyHouse()
+#	    house.phone = phone
+#	    house.community = comnyName
+#	    house.communityID = comnyID
+#	    house.site = site
+#	    house.sip = comnyID + site
+#	    house.status = st
+#	    db.session.add(house)
+#	    db.session.commit()
+#	    return RETURN.SUCC
+#	
+#	def house_del(phone, comnyID, site):
+#	    ''' 删除住宅信息 '''
+#	    house = MyHouse.query.filter(phone == MyHouse.phone, comnyID == MyHouse.communityID, site == MyHouse.site).first()
+#	    if house is None:
+#	        return 
+#	    db.session.delete(house)
+#	    db.session.commit()
+#	    return RETURN.SUCC
+#	
+#	def monitor_add(phone, comnyID, comnyName, devicetype, site, st=STAT.OPEN):
+#	    ''' 添加监控信息 '''
+#	    monitor = Monitor()
+#	    monitor.phone = phone
+#	    monitor.community = comnyName
+#	    monitor.communityID = comnyID
+#	    monitor.devicetype = devicetype
+#	    monitor.site = site
+#	    monitor.sip = comnyID + site
+#	    monitor.status = st
+#	    db.session.add(monitor)
+#	    db.session.commit()
+#	    return RETURN.SUCC
+#	
+#	def monitor_del(phone, comnyID, site):
+#	    ''' 删除监控信息 '''
+#	    monitor = Monitor.query.filter(phone == Monitor.phone, comnyID == Monitor.communityID, site == Monitor.site).first()
+#	    if monitor is None:
+#	        return 
+#	    db.session.delete(monitor)
+#	    db.session.commit()
+#	    return RETURN.SUCC
