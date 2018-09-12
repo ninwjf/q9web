@@ -116,7 +116,7 @@ def house_Join(community, communityName, households, monitors, st =STAT.OPEN):
         for monitor in jsmonitors:
             len = monitor['Site'].find('00')
             if len == -1: 
-                len = monitor['Site'].length -2
+                len = len(monitor['Site']) - 2
 
             # 区栋单元一致
             if monitor['Site'][0:len] == household['Site'][0:len]:
