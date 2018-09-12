@@ -140,12 +140,12 @@ def house_UnJoin(community, communityName, households, st =STAT.OPEN):
         db.session.delete(house)
         montr = Monitor.query.filter(h['Phone'] == Monitor.phone, community == Monitor.communityID).all()
         for i in montr:
-            len = i.site.find('00')
-            if len == -1: 
-                len = i.site.length -2
+            slen = i.site.find('00')
+            if slen == -1: 
+                slen = len(i.site) - 2
 
             # 区栋单元一致
-            if h['Site'][0:len] == i.site[0:len]:
+            if h['Site'][0:slen] == i.site[0:slen]:
                 db.session.delete(i)
     db.session.commit()
     ret = RETURN.SUCC.copy()
