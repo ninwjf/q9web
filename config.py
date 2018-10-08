@@ -14,7 +14,7 @@ class CONFIG():
 
 
     #数据库配置
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:123456@127.0.0.1:3306/freeswitch?charset=utf8'  #数据库URI
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:gusonweb@120.79.92.166:3306/freeswitch?charset=utf8'  #数据库URI
     SQLALCHEMY_TRACK_MODIFICATIONS = False  # 查询跟踪，不太需要，False，不占用额外的内存
 
     #短信接口
@@ -41,6 +41,53 @@ class CONFIG():
 
     # 日志配置
     #日志目录配置
-    LOGPATH = '/home/web/log/q9web.log'
+    LOGPATH = '/home/web/log/'
+    LOGCONFIG = [
+        {
+            'version': 1,
+            'disable_existing_loggers': True,
+            'formatters': {
+                'verbose': {
+                'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+                'datefmt': "%Y-%m-%d %H:%M:%S"
+                },
+            'simple': {
+                'format': '%(levelname)s %(message)s'
+                },
+            },
+            'handlers': {
+                'null': {
+                    'level': 'DEBUG',
+                    'class': 'logging.NullHandler',
+                },
+                'console': {
+                    'level': 'DEBUG',
+                    'class': 'logging.StreamHandler',
+                    'formatter': 'verbose'
+                },
+                'file': {
+                    'level': 'DEBUG',
+                    # 如果没有使用并发的日志处理类，在多实例的情况下日志会出现缺失
+                    'class': 'cloghandler.ConcurrentRotatingFileHandler',
+                    #'class': 'logging.RotatingFileHandler',
+                    # 当达到10MB时分割日志
+                    'maxBytes': 1024 * 1024 * 10,
+                    # 最多保留50份文件
+                    'backupCount': 50,
+                    # If delay is true,
+                    # then file opening is deferred until the first call to emit().
+                    'delay': True,
+                    'filename': 'logs/mysite.log',
+                    'formatter': 'verbose'
+                }
+            },
+            'loggers': {
+                '': {
+                    'handlers': ['file'],
+                    'level': 'info',
+                },
+            }
+        }
+    ]
 
 

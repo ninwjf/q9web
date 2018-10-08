@@ -4,7 +4,7 @@ import json
 from . import mobile
 from .modles import RETURN, SMSTYPE, sms_send, sms_check, sms_reqIsRepeat, sms_reqNoTimes # 响应消息及短信相关
 from .modles import user_isExist, user_registered, user_checkPWD, user_chgpwd # 用户相关
-from .modles import house_get, monitor_get, monitor_chk, monitor_open, disable_safties #其它
+from .modles import house_get, monitor_get, monitor_chk, monitor_open, disable_safties, token_add #其它
 from config import CONFIG
 
 @mobile.route('/SendSMS', methods=['GET', 'POST'])  # 发送短信验证码
@@ -141,7 +141,7 @@ def Opendoor():
         ret = monitor_open(sip)
     return json.dumps(ret, ensure_ascii=False)
 
-@mobile.route('/DisableSafties', methods=['GET', 'POST'])  # 二维码开锁
+@mobile.route('/DisableSafties', methods=['GET', 'POST'])  # 撤防
 def DisableSafties():
     args = request.args if request.method == 'GET' else request.form
     phone = args.get('id', None) 
@@ -165,4 +165,24 @@ def DisableSafties():
         #    return json.dumps(status, ensure_ascii=False)
         # 回调中返回结果
         ret = disable_safties(phone, communityID, communityName, addr, time, typee, action)
+    return json.dumps(ret, ensure_ascii=False)
+
+@mobile.route('/GetDeviceToken', methods=['GET', 'POST'])  # 获取token码, 需要APP判断token码是否发生变化。无变化不需要发送过来
+def GetDeviceToken():
+    args = request.args if request.method == 'GET' else request.form
+    phone = args.get('id', None)
+    pwd = args.get('pwd', None)
+    tokenType = args.get('tokenType', None)
+    token = args.get('token', None)
+    uuid = args.get('uuid', None)
+
+    ret = RETURN.SYSERR
+    if not (phone and pwd and tokenType and token and uuid):    # 参数错误
+        ret = RETURN.PARMERR
+    elif not user_isExist(phone):    # 用户不存在
+        ret = RETURN.NOTEXIST
+    elif not user_checkPWD(phone, pwd):
+        ret = RETURN.PWDERR # 密码错误
+    else:
+        ret = token_add(id, tokenType, token, uuid)
     return json.dumps(ret, ensure_ascii=False)

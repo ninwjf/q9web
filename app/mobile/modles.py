@@ -1,6 +1,6 @@
 import datetime, random, uuid, json
 
-from tables import db, STAT, User, Sms, MyHouse, Monitor, DeciveTYPE, SiteToName
+from tables import db, STAT, User, Sms, MyHouse, Monitor, DeciveTYPE, SiteToName, Token
 from config import CONFIG
 from dysms_python.demo_sms_send import send_sms
 from app.sioServer.modles import send2Q8i, MSGTYPE
@@ -14,6 +14,10 @@ class RETURN():
     ''' 响应码，响应信息 '''
     SUCC        = {"Code": "00", "MESSAGE":"交易成功"}
     REG_SUCC    = {"Code": "00", "MESSAGE":"注册成功"}
+    SMS_SUCC    = {"Code": "00", "MESSAGE":"短信发送成功"}
+    PWD_SUCC    = {"Code": "00", "MESSAGE":"密码修改成功"}
+    CMD_SUCC    = {"Code": "00", "MESSAGE":"指令发送成功"}
+
     PARMERR     = {"Code": "01", "MESSAGE":"参数错误"}
     SYSERR      = {"Code": "02", "MESSAGE":"系统错误"}
     PHONEERR    = {"Code": "03", "MESSAGE":"非法手机号"}
@@ -81,7 +85,7 @@ def user_chgpwd(phone, pwd):
     if user:
         user.pwd = pwd
         db.session.commit()
-    return RETURN.SUCC
+    return RETURN.PWD_SUCC
 
 def user_registered(phone, pwd):
     ''' 用户注册 '''
@@ -159,7 +163,7 @@ def sms_send(phone, tmpl = CONFIG.SMS_TMPL_CODE):
     s = send_sms(uuid.uuid1(), phone, CONFIG.SMS_SIGN_NAME, tmpl, "{\"code\":\"%s\"}" % code)
     ret = json.loads(s)['Code']
     if ret == 'OK':
-        return RETURN.SUCC
+        return RETURN.SMS_SUCC
     elif ret == 'isv.MOBILE_NUMBER_ILLEGAL':
         return RETURN.PHONEERR
     elif ret == 'isv.AMOUNT_NOT_ENOUGH':
@@ -189,4 +193,19 @@ def disable_safties(phone, communityID, communityName, addr, time, typee, action
     }
 
     send2Q8i(MSGTYPE.Disarm, disbSaftMsg, funback)
+    return RETURN.CMD_SUCC
+
+    
+def token_add(phone, tokenType, token, uuid, dt=datetime.datetime.now(), st=STAT.OPEN):
+    ''' 添加IOS设备deviceToken '''
+    tok = Token()
+    tok.phone = phone
+    tok.tokenType = tokenType
+    tok.token = token
+    tok.uuid = uuid
+    tok.dtTime = datetime.datetime.now()
+    tok.status = st
+    db.session.add(tok)
+    db.session.commit()
+
     return RETURN.SUCC

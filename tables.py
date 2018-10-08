@@ -14,7 +14,11 @@ class STAT():
         LOCK: u"锁定"
     }
 
-def SiteToName(site, devicetype):
+class TokenType():
+    IOS_APNS = 0 # IOS APNS推送
+    IOS_VOIP = 1 # IOS VOIP推送
+
+def SiteToName(site, devicetype = None):
     if len(site) != 12:
         return ""
 
@@ -23,7 +27,9 @@ def SiteToName(site, devicetype):
         name += site[2:4] + u"栋"
     if site[4:-6] != "00":
         name += site[4:6] + u"单元"
-    name += DeciveTYPE().GetString(devicetype) + site[-2:]
+    if devicetype:
+        name += DeciveTYPE().GetString(devicetype) 
+    name += site[-2:]
     return name
 
 class DeciveTYPE():
@@ -142,6 +148,17 @@ class Monitor(db.Model):
     devicetype = db.Column(db.Integer)
     site = db.Column(db.String(15))
     sip = db.Column(db.String(25))
+    status = db.Column(db.Integer)
+
+class Token(db.Model):
+    ''' 监控设备列表 '''
+    __tablename__ = 'web_token'
+    id = db.Column(db.Integer, db.Sequence('monitr_id_seq'), primary_key=True)
+    phone = db.Column(db.String(20))
+    tokenType = db.Column(db.Integer)
+    token = db.Column(db.String(65))
+    uuid = db.Column(db.String(40))
+    dtTime = db.Column(db.DateTime)
     status = db.Column(db.Integer)
 
 ############# freeswitch #######################

@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_apscheduler import APScheduler
 from flask import render_template
 from flask_socketio import SocketIO
+import logging
 
 from config import CONFIG
 
