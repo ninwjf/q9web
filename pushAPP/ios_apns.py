@@ -1,43 +1,46 @@
 from apns2.client import APNsClient, Notification
 from apns2.payload import Payload
-'''
-token_hex = '1fb4b04ab35207acdcc2a5be64483994e675496f3d6360f36d88b4d98f53231d'
-token_hex1 = '1111b04ab35207acdcc2a5be64483994e675496f3d6360f36d88b4d98f53231d'
+from config import CONFIG
 
-alert = {
-			"loc-key": "IC_MSG",
-			"command": "CALL",
-			"device-system": "Q8",
-			"device-name": "1号门监控机"
-		}
+class Msg_Type():
+    # IM 消息   IC 呼叫
+    IM = "IM_MSG"  # 消息
+    IC = "IC_MSG"  # 呼叫
 
-notification = Payload(alert=alert)
-tokens = []
-tokens.append(token_hex)
-tokens.append(token_hex1)
-notifications = [Notification(token=token, payload=notification) for token in tokens]
+class Msg_Cmd():
+    # CALL 呼叫   INFORMATION 小区消息 SECURITY 安防报警消息
+    CALL = "CALL"  # 呼叫
+    INFORMATION = "INFORMATION"  # 小区消息
+    SECURITY = "SECURITY"  # 安防报警消息
 
-topic = 'com.guson.q8.voip'
-client = APNsClient('developent2.pem', use_sandbox=True, use_alternative_port=True)
+iosClient = APNsClient('developent2.pem', use_sandbox= not CONFIG.DEBUG)
 
-#client.send_notification(token_hex, notification, topic)
-#client.send_notification_async(token_hex, notification, topic)
-results = client.send_notification_batch(notifications, topic)
-print(results)
-#client.send_notification(token_hex1, payload, topic)
-'''
-class AppPush():
-	def __init__(self, debug = False):
-		self.iosClient = APNsClient('developent2.pem', use_sandbox= not debug)
+def pushCallIOS(tokens, community, site):
+	notification = {
+                "loc-key": Msg_Type.IC,
+                "command": Msg_Cmd.CALL,
+                "device-system": community,
+                "device-name": site
+            }
+	notifications = [Notification(token=token, payload=Payload(alert=notification)) for token in tokens]
+	iosClient.send_notification_batch(notifications, topic = 'com.guson.q8.voip')
 
-	def setNotifications(self, tokens, notification):
-		self.notifications = [Notification(token=token, payload=Payload(alert=notification)) for token in tokens]
-		return self.notifications
-
-	def pushIosVoip(self, notifications = None):
-		if notifications is not None:
-			self.notifications = notifications
-		if self.notifications is None:
-			return
-		topic = 'com.guson.q8.voip'
-		return self.iosClient.send_notification_batch(notifications, topic)
+def pushInfoIOS(tokens, community, site):
+	notification = {
+                "loc-key": Msg_Type.IM,
+                "command": Msg_Cmd.INFORMATION,
+                "device-system": community,
+                "device-name": site
+            }
+	notifications = [Notification(token=token, payload=Payload(alert=notification)) for token in tokens]
+	iosClient.send_notification_batch(notifications, topic = 'com.guson.q8.voip')
+	
+def pushSecurityIOS(tokens, community, site):
+	notification = {
+                "loc-key": Msg_Type.IM,
+                "command": Msg_Cmd.SECURITY,
+                "device-system": community,
+                "device-name": site
+            }
+	notifications = [Notification(token=token, payload=Payload(alert=notification)) for token in tokens]
+	iosClient.send_notification_batch(notifications, topic = 'com.guson.q8.voip')
