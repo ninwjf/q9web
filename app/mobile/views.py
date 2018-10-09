@@ -173,7 +173,7 @@ def GetDeviceToken():
     phone = args.get('id', None)
     pwd = args.get('pwd', None)
     tokenType = args.get('tokenType', None)
-    token = args.get('token', None)
+    token = args.get('token', None).replace(' ', '')
     uuid = args.get('uuid', None)
 
     ret = RETURN.SYSERR
