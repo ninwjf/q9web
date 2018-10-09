@@ -198,7 +198,9 @@ def disable_safties(phone, communityID, communityName, addr, time, typee, action
     
 def token_add(phone, tokenType, token, uuid, dt=datetime.datetime.now(), st=STAT.OPEN):
     ''' 添加IOS设备deviceToken '''
-    tok = Token()
+    tok = Token.query.filter(phone == Token.phone).first()
+    if tok is  None:
+        tok = Token()
     tok.phone = phone
     tok.tokenType = tokenType
     tok.token = token

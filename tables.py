@@ -153,7 +153,7 @@ class Monitor(db.Model):
 class Token(db.Model):
     ''' 监控设备列表 '''
     __tablename__ = 'web_token'
-    id = db.Column(db.Integer, db.Sequence('monitr_id_seq'), primary_key=True)
+    id = db.Column(db.Integer, db.Sequence('token_id_seq'), primary_key=True)
     phone = db.Column(db.String(20))
     tokenType = db.Column(db.Integer)
     token = db.Column(db.String(65))

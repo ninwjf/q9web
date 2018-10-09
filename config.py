@@ -9,9 +9,10 @@ load_dotenv(os.path.join(basedir, '.env'))
 
 """
 class CONFIG():
+    #调试模式
+    DEBUG = True
     #服务监听端口
     PORT = 5050
-
 
     #数据库配置
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:gusonweb@120.79.92.166:3306/freeswitch?charset=utf8'  #数据库URI

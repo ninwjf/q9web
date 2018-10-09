@@ -1,5 +1,6 @@
 from tables import db, STAT, User, MyHouse, Registrations, Monitor, SiteToName, Token, TokenType
-from pushAPP.ios_apns import pushVoipTokens
+from pushAPP.ios_apns import AppPush
+from config import CONFIG
 
 class Msg_Type():
     # IM 消息   IC 呼叫
@@ -36,14 +37,12 @@ def PushService(sip, MSG_TYPE = 0):
         
     #//IC_MSG: 呼叫，IM_MSG: 消息
     #//CALL: 呼叫，INFORMATION: 小区消息，SECURITY: 安防报警消息
-    payload = {
-        "aps": {
-            "alert": {
+    alert = {
                 "loc-key": "IC_MSG",
                 "command": "CALL",
                 "device-system": "Q8",
-                "device-name": "1号门监控机",
+                "device-name": "1号门监控机"
             }
-        }
-    }
-    pushVoipTokens(tokens, payload)
+    push = AppPush(CONFIG.DEBUG)
+    result = push.pushIosVoip(notifications = push.setNotifications(tokens, alert))
+    print(result)

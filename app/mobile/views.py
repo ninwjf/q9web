@@ -184,5 +184,5 @@ def GetDeviceToken():
     elif not user_checkPWD(phone, pwd):
         ret = RETURN.PWDERR # 密码错误
     else:
-        ret = token_add(id, tokenType, token, uuid)
+        ret = token_add(phone, tokenType, token, uuid)
     return json.dumps(ret, ensure_ascii=False)

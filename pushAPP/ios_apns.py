@@ -1,54 +1,43 @@
-from hyper import HTTPConnection, tls
-import eventlet, json, datetime
+from apns2.client import APNsClient, Notification
+from apns2.payload import Payload
 '''
-tokens = {'1fb4b04ab35207acdcc2a5be64483994e675496f3d6360f36d88b4d98f53231d',
-    '1fb4b04ab35207acdcc2a5be64483994e675496f3d6360f36d88b4d98f53231d',
-    }
-#//IC_MSG: 呼叫，IM_MSG: 消息
-#//CALL: 呼叫，INFORMATION: 小区消息，SECURITY: 安防报警消息
-payload = {
-	"aps": {
-		"alert": {
+token_hex = '1fb4b04ab35207acdcc2a5be64483994e675496f3d6360f36d88b4d98f53231d'
+token_hex1 = '1111b04ab35207acdcc2a5be64483994e675496f3d6360f36d88b4d98f53231d'
+
+alert = {
 			"loc-key": "IC_MSG",
-            "command": "CALL",
-            "device-system": "Q8",
-			"device-name": "1号门监控机",
+			"command": "CALL",
+			"device-system": "Q8",
+			"device-name": "1号门监控机"
 		}
-	}
-}
-headers = {
-    "apns-topic": 'com.guson.q8.voip',  # bundle ID
-}
+
+notification = Payload(alert=alert)
+tokens = []
+tokens.append(token_hex)
+tokens.append(token_hex1)
+notifications = [Notification(token=token, payload=notification) for token in tokens]
+
+topic = 'com.guson.q8.voip'
+client = APNsClient('developent2.pem', use_sandbox=True, use_alternative_port=True)
+
+#client.send_notification(token_hex, notification, topic)
+#client.send_notification_async(token_hex, notification, topic)
+results = client.send_notification_batch(notifications, topic)
+print(results)
+#client.send_notification(token_hex1, payload, topic)
 '''
-class PushType():
-    Q8_APNS = 'com.guson.q8'
-    Q8_VOIP = 'com.guson.q8.voip'
+class AppPush():
+	def __init__(self, debug = False):
+		self.iosClient = APNsClient('developent2.pem', use_sandbox= not debug)
 
-def pushApns(token, payload, headers, func = None):
-    # gateway.sandbox.push.apple.com:2195 生产环境去掉其中的 sandbox
-    # api.development.push.apple.com:443 生产环境去掉其中的 development
-    
-    timee = datetime.datetime.now()
-    conn = HTTPConnection('api.development.push.apple.com:443', ssl_context=tls.init_context(cert='developent2.pem'))
-    conn.request('POST', '/3/device/%s' % token, body=json.dumps(payload), headers=headers)
-    resp = conn.get_response()
-    if func:
-        if resp.status != 200:
-            func(token, timee)
-    d = resp.read()
-    print({
-            "status": resp.status,
-            "error_msg": d,
-            "headers": dict(resp.headers)
-        })
-    return {"status": resp.status,"error_msg": d,"headers": dict(resp.headers)}
+	def setNotifications(self, tokens, notification):
+		self.notifications = [Notification(token=token, payload=Payload(alert=notification)) for token in tokens]
+		return self.notifications
 
-def pushVoipTokens(tokens, pyload, func = None):
-    headers = {
-        "apns-topic": PushType.Q8_VOIP,  # bundle ID
-    }
-
-    pile = eventlet.GreenPool()
-    for token in tokens:
-        # pile.spawn(pushApns, token, pyload, headers)
-        pile.spawn_n(pushApns, token, pyload, headers, func)
+	def pushIosVoip(self, notifications = None):
+		if notifications is not None:
+			self.notifications = notifications
+		if self.notifications is None:
+			return
+		topic = 'com.guson.q8.voip'
+		return self.iosClient.send_notification_batch(notifications, topic)
