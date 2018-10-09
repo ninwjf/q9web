@@ -2,11 +2,6 @@ from tables import db, STAT, User, MyHouse, Registrations, Monitor, SiteToName, 
 from pushAPP.ios_apns import AppPush
 from config import CONFIG
 
-class Msg_Type():
-    # IM 消息   IC 呼叫
-    IM = 0  # 消息
-    IC = 1  # 呼叫
-
 def user_getPWD(phone):
     i = db.session.query(User.phone, User.pwd, User.usertype).filter(phone == User.phone, STAT.OPEN == User.status).first()
     return i.pwd if i else None, SiteToName(i.phone[8:], i.usertype) if i else None
@@ -24,24 +19,37 @@ def ipPort_get(sip):
     i = db.session.query(Registrations.network_ip, Registrations.network_port).filter(Registrations.reg_user == sip).first()
     return i.network_ip, i.network_port
 
-def PushService(sip, MSG_TYPE = 0):
-    ''' 推送服务  '''
+class Msg_Type():
+    # IM 消息   IC 呼叫
+    IM = "IM_MSG"  # 消息
+    IC = "IC_MSG"  # 呼叫
+    
+class Msg_Cmd():
+    # CALL 呼叫   INFORMATION 小区消息 SECURITY 安防报警消息
+    CALL = "CALL"  # 呼叫
+    INFORMATION = "INFORMATION"  # 小区消息
+    SECURITY = "SECURITY"  # 安防报警消息
+
+def PushService(sip, MSG_TYPE):
+    ''' 推送服务 
+    由于在线状态不准确，无法根据在线状态判断是否推送，所以全都推送，后期有时间可优化 '''
     # 获取所有关联用户 且 有相关推送信息
-    # 获取在线用户，及设备类型
-    bridges = db.session.query(MyHouse.phone, MyHouse.community, MyHouse.site, Token.token).filter(MyHouse.sip == sip, MyHouse.status == STAT.OPEN, 
+    bridges = db.session.query(MyHouse.phone, MyHouse.community, MyHouse.site, MyHouse.site, Token.token).filter(MyHouse.sip == sip, MyHouse.status == STAT.OPEN, 
         Token.phone == MyHouse.phone, Token.tokenType == TokenType.IOS_VOIP).all()
-    # 推送
     tokens = []
+    if len(bridges) == 0:
+        return
     for i in bridges:
         tokens.append(i.token)
         
     #//IC_MSG: 呼叫，IM_MSG: 消息
-    #//CALL: 呼叫，INFORMATION: 小区消息，SECURITY: 安防报警消息
+    #//CALL: 呼叫 ，INFORMATION: 小区消息， SECURITY: 安防报警消息
+    cmd = Msg_Cmd.CALL
     alert = {
-                "loc-key": "IC_MSG",
-                "command": "CALL",
-                "device-system": "Q8",
-                "device-name": "1号门监控机"
+                "loc-key": MSG_TYPE,
+                "command": cmd,
+                "device-system": bridges[0].community,
+                "device-name": SiteToName(bridges[0].site)
             }
     push = AppPush(CONFIG.DEBUG)
     result = push.pushIosVoip(notifications = push.setNotifications(tokens, alert))

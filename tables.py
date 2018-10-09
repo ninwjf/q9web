@@ -19,7 +19,10 @@ class TokenType():
     IOS_VOIP = 1 # IOS VOIP推送
 
 def SiteToName(site, devicetype = None):
-    if len(site) != 12:
+    # 010101000004 12位 转 01区01栋01单元门口机04
+    # 0101010301 10位 转 01区01栋01单元0301室
+    strl = len(site)
+    if (strl < 2 or strl > 12 or strl % 2 == 1):
         return ""
 
     name = site[0:2] + u"区"
@@ -28,8 +31,11 @@ def SiteToName(site, devicetype = None):
     if site[4:-6] != "00":
         name += site[4:6] + u"单元"
     if devicetype:
-        name += DeciveTYPE().GetString(devicetype) 
-    name += site[-2:]
+        name += DeciveTYPE().GetString(devicetype)
+    if strl == 12:
+        name += site[-2:]
+    if strl == 10:
+        name += site[6:10] + u"室"
     return name
 
 class DeciveTYPE():
