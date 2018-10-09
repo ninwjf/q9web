@@ -90,10 +90,6 @@ def fs_sendChat(community, msg, dir, st = STAT.OPEN):
         MyHouse.phone == Token.phone, Token.tokenType == TokenType.IOS_VOIP).all()
     tokens = []
     for i in houses:
-        # 通过SIP号查询 IP端口
-        seder = db.session.query(Registrations.realm, Registrations.network_ip, Registrations.network_port).filter(Registrations.reg_user == i.phone).first()
-        # 发送消息
-        send_chat(i.phone + "@" + seder.realm, seder.network_ip, seder.network_port, msg, i.community)
         tokens.append(i.token)
     # 推送
     if msg[0:8] == "WWAARRNN":
@@ -101,6 +97,12 @@ def fs_sendChat(community, msg, dir, st = STAT.OPEN):
     else:
         pushInfoIOS(tokens, community, dir)
 
+
+    for i in houses:
+        # 通过SIP号查询 IP端口
+        seder = db.session.query(Registrations.realm, Registrations.network_ip, Registrations.network_port).filter(Registrations.reg_user == i.phone).first()
+        # 发送消息
+        send_chat(i.phone + "@" + seder.realm, seder.network_ip, seder.network_port, msg, i.community)
 
     ret = RETURN.SUCC.copy()
     return ret
