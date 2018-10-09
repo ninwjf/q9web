@@ -1,6 +1,6 @@
 import datetime, json, inspect, random
 
-from tables import db, STAT, Community, MyHouse, Monitor, User, Registrations, Token, TokenType
+from tables import db, STAT, Community, MyHouse, Monitor, User, Registrations, Token, TokenType, SiteToName
 from fs_ESL.fs_chat import send_chat
 from pushAPP.ios_apns import pushInfoIOS, pushSecurityIOS
 
@@ -86,14 +86,14 @@ def comny_chgPwd(account, pwd, newPwd, st = STAT.OPEN):
 
 def fs_sendChat(community, msg, dir, st = STAT.OPEN):
     # 获取发送SIP列表
-    houses = db.session.query(MyHouse.phone, Token.token).filter(community == MyHouse.communityID, dir == MyHouse.site, st == MyHouse.status,
+    houses = db.session.query(MyHouse.phone, MyHouse.community, Token.token).filter(community == MyHouse.communityID, dir == MyHouse.site, st == MyHouse.status,
         MyHouse.phone == Token.phone, Token.tokenType == TokenType.IOS_VOIP).all()
     tokens = []
     for i in houses:
         # 通过SIP号查询 IP端口
         seder = db.session.query(Registrations.realm, Registrations.network_ip, Registrations.network_port).filter(Registrations.reg_user == i.phone).first()
         # 发送消息
-        send_chat(i.phone + "@" + seder.realm, seder.network_ip, seder.network_port, msg)
+        send_chat(i.phone + "@" + seder.realm, seder.network_ip, seder.network_port, msg, i.community)
         tokens.append(i.token)
     # 推送
     if msg[0:8] == "WWAARRNN":
