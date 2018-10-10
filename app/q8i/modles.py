@@ -85,25 +85,24 @@ def comny_chgPwd(account, pwd, newPwd, st = STAT.OPEN):
         return RETURN.PWDERR
 
 def fs_sendChat(community, msg, dir, st = STAT.OPEN):
-    # 获取发送SIP列表
-    houses = db.session.query(MyHouse.phone, MyHouse.community, Token.token).filter(community == MyHouse.communityID, dir == MyHouse.site, st == MyHouse.status,
+    # 获取推送列表
+    pushs = db.session.query(MyHouse.phone, MyHouse.community, Token.token).filter(community == MyHouse.communityID, dir == MyHouse.site, st == MyHouse.status,
         MyHouse.phone == Token.phone, Token.tokenType == TokenType.IOS_VOIP).all()
     tokens = []
-    for i in houses:
+    for i in pushs:
         tokens.append(i.token)
     # 推送
-    if len(tokens) > 0:
-        if msg[0:8] == "WWAARRNN":
-            pushSecurityIOS(tokens, houses[0].community, SiteToName(dir))
-        else:
-            pushInfoIOS(tokens, houses[0].community, SiteToName(dir))
+    if len(pushs) > 0:
+        if msg[0:6] == "MMSSGG":
+            pushInfoIOS(tokens, pushs[0].community, SiteToName(dir))
+        elif msg[0:8] == "WWAARRNN":
+            pushSecurityIOS(tokens, pushs[0].community, SiteToName(dir))
 
-
-    for i in houses:
-        # 通过SIP号查询 IP端口
-        seder = db.session.query(Registrations.realm, Registrations.network_ip, Registrations.network_port).filter(Registrations.reg_user == i.phone).first()
-        # 发送消息
-        send_chat(i.phone + "@" + seder.realm, seder.network_ip, seder.network_port, msg, i.community)
+    # 获取消息发送列表
+    sends = db.session.query(MyHouse.phone, MyHouse.community, Registrations.realm, Registrations.network_ip, Registrations.network_port).filter(community == MyHouse.communityID, dir == MyHouse.site, st == MyHouse.status,
+        Registrations.reg_user == MyHouse.phone).all()
+    for i in sends:
+        send_chat(i.phone + "@" + i.realm, i.network_ip, i.network_port, msg, i.community)
 
     ret = RETURN.SUCC.copy()
     return ret
