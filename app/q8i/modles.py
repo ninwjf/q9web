@@ -92,7 +92,7 @@ def fs_sendChat(community, msg, dir, st = STAT.OPEN):
     for i in houses:
         tokens.append(i.token)
     # 推送
-    if len(houses) > 0:
+    if len(tokens) > 0:
         if msg[0:8] == "WWAARRNN":
             pushSecurityIOS(tokens, houses[0].community, SiteToName(dir))
         else:
