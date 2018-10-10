@@ -102,7 +102,7 @@ def fs_sendChat(community, msg, dir, st = STAT.OPEN):
     sends = db.session.query(MyHouse.phone, MyHouse.community, Registrations.realm, Registrations.network_ip, Registrations.network_port).filter(community == MyHouse.communityID, dir == MyHouse.site, st == MyHouse.status,
         Registrations.reg_user == MyHouse.phone).all()
     for i in sends:
-        send_chat(i.phone + "@" + i.realm, i.network_ip, i.network_port, msg, i.community)
+        send_chat(i.phone + "@" + i.realm, i.network_ip, i.network_port, msg)
 
     ret = RETURN.SUCC.copy()
     return ret
