@@ -4,10 +4,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_apscheduler import APScheduler
 from flask import render_template
 from flask_socketio import SocketIO
-import logging
+import logging, logging.config
 
 from config import CONFIG
 
+logging.config.dictConfig(CONFIG.LOGCONFIG)
 class Config(object):
     JOBS = CONFIG.JOBS
     # 加入以下参数 启动时，如果任务已经存在数据库中会报错
