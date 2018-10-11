@@ -42,7 +42,7 @@ class CONFIG():
     ]
 
     # 日志配置 https://docs.python.org/3/library/logging.config.html
-    LOGPATH = '~/log' if sysName == "Linux" else 'log/'
+    LOGPATH = '/home/web/log/' if sysName == "Linux" else 'log/'
     LOGCONFIG = {
 	'version': 1,   # 表示模式版本的整数值。目前唯一有效的值是1
 	'disable_existing_loggers': True,   # 默认 True 禁用任何现有记录器
