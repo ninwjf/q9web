@@ -13,7 +13,7 @@ class Msg_Cmd():
     INFORMATION = "INFORMATION"  # 小区消息
     SECURITY = "SECURITY"  # 安防报警消息
 
-iosClient = APNsClient('developent2.pem', use_sandbox= not CONFIG.DEBUG)
+iosClient = APNsClient('developent2.pem', use_sandbox= CONFIG.DEBUG)
 
 def pushCallIOS(tokens, community, site):
 	notification = {

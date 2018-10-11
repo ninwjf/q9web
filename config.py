@@ -10,7 +10,7 @@ load_dotenv(os.path.join(basedir, '.env'))
 """
 class CONFIG():
     #调试模式
-    DEBUG = True
+    DEBUG = False
     #服务监听端口
     PORT = 5050
 
@@ -40,55 +40,74 @@ class CONFIG():
     ]
 
 
-    # 日志配置
+    # 日志配置 https://docs.python.org/3/library/logging.config.html
     #日志目录配置
     LOGPATH = '/home/web/log/'
-    LOGCONFIG = [
-        {
-            'version': 1,
-            'disable_existing_loggers': True,
-            'formatters': {
-                'verbose': {
-                'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
-                'datefmt': "%Y-%m-%d %H:%M:%S"
-                },
-            'simple': {
-                'format': '%(levelname)s %(message)s'
-                },
-            },
-            'handlers': {
-                'null': {
-                    'level': 'DEBUG',
-                    'class': 'logging.NullHandler',
-                },
-                'console': {
-                    'level': 'DEBUG',
-                    'class': 'logging.StreamHandler',
-                    'formatter': 'verbose'
-                },
-                'file': {
-                    'level': 'DEBUG',
-                    # 如果没有使用并发的日志处理类，在多实例的情况下日志会出现缺失
-                    'class': 'cloghandler.ConcurrentRotatingFileHandler',
-                    #'class': 'logging.RotatingFileHandler',
-                    # 当达到10MB时分割日志
-                    'maxBytes': 1024 * 1024 * 10,
-                    # 最多保留50份文件
-                    'backupCount': 50,
-                    # If delay is true,
-                    # then file opening is deferred until the first call to emit().
-                    'delay': True,
-                    'filename': 'logs/mysite.log',
-                    'formatter': 'verbose'
-                }
-            },
-            'loggers': {
-                '': {
-                    'handlers': ['file'],
-                    'level': 'info',
-                },
-            }
-        }
-    ]
-
-
+    LOGCONFIG = {
+	'version': 1,   # 表示模式版本的整数值。目前唯一有效的值是1
+	'disable_existing_loggers': True,   # 默认 True 禁用任何现有记录器
+	'incremental': False,	# 默认 False 覆盖原有配置 如果为True，也不是完全覆盖 但是可以替代logger对象的level和propagate属性，handler对象的level属性
+	'formatters': { # 日志格式
+		# 每个 formatters 由一个 format 和一个 datefmt 组成，默认值为None
+		'verbose': {
+			'format': "[%(asctime)s] %(levelname)-8s [%(name)s:%(filename)s:%(lineno)s] %(message)s",
+			# 'datefmt': "%Y-%m-%d %H:%M:%S" 使用默认日期格式
+		},
+		'simple': {
+			'format': ""
+		},
+		'thread': {
+			'format': "[%(asctime)s] %(levelname)-8s [%(name)s:%(filename)s:%(lineno)s] (%(process)d:%(thread)d) %(message)s",
+		}
+	},
+	'filters': { # 过滤器
+		# 待研究
+	},
+	'handlers': {   # 处理器
+		'null': {
+			'class': 'logging.NullHandler',
+			# 'formatter': 'simple',	可选, 格式化程序ID
+			# 'level': 'DEBUG',			可选, 日志级别
+            # 'filters': [allow_foo]	可选, 过滤器ID
+		},
+		'console': {
+			'class': 'logging.StreamHandler',
+			'formatter': 'verbose',		#可选, 格式化程序ID
+			'level': 'DEBUG',			#可选, 日志级别
+            # 'filters': [allow_foo]	可选, 过滤器ID
+            'stream': "ext://sys.stdout",	#可选
+		},
+		'file': {
+			'class': 'logging.handlers.RotatingFileHandler',	#线程安全？
+			'formatter': 'verbose',
+			'level': 'DEBUG',
+			'filename': 'logs/mysite.log',
+			'maxBytes': 1024*1024*10,	#可选,当达到10MB时分割日志
+			'backupCount': 50,	#可选,最多保留50份文件
+		},
+		'file1': {
+			'class': 'cloghandler.ConcurrentRotatingFileHandler',	#进程安全的 需要安装 pip install ConcurrentLogHandler
+			#如果没有使用并发的日志处理类，在多实例的情况下日志会出现缺失'class': 'cloghandler.ConcurrentRotatingFileHandler',
+			#'class': 'logging.RotatingFileHandler',
+			#当达到10MB时分割日志'maxBytes': 1024*1024*10,
+			#最多保留50份文件'backupCount': 50,
+			#Ifdelayistrue,
+			#thenfileopeningisdeferreduntilthefirstcalltoemit().'delay': True,
+			'formatter': 'verbose',		#可选, 格式化程序ID
+			'level': 'DEBUG',			#可选, 日志级别
+            # 'filters': [allow_foo]	可选, 过滤器ID
+			'filename': 'logs/mysite.log',
+			'maxBytes': 1024*1024*10,	#可选,当达到10MB时分割日志
+			'backupCount': 50,	#可选,最多保留50份文件
+		},
+	},
+	'loggers': {	# 记录器
+		'': {
+			'handlers': ['file'],
+			'level': 'info',
+            # 'filters': [allow_foo]	可选, 过滤器ID
+			#'propagate': '', #可选,传播设置  1表示消息必须从此记录器传播到记录器层次结构上方的处理程序，或者0表示消息不会传播到层次结构中的处理程序
+		},
+		
+	}
+}
