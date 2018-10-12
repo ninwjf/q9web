@@ -1,6 +1,8 @@
-from tables import db, STAT, User, MyHouse, Registrations, Monitor, SiteToName, Token, TokenType
-from pushAPP.ios_apns import pushCallIOS
+from app.APPpush.ios_apns import pushCallIOS
+from app.tables import (STAT, Monitor, MyHouse, Registrations, SiteToName,
+                        Token, TokenType, User, db)
 from config import CONFIG
+
 
 def user_getPWD(phone):
     i = db.session.query(User.phone, User.pwd, User.usertype).filter(phone == User.phone, STAT.OPEN == User.status).first()

@@ -1,11 +1,16 @@
-from flask import render_template, request
 import json
 
-from . import mobile
-from .modles import RETURN, SMSTYPE, sms_send, sms_check, sms_reqIsRepeat, sms_reqNoTimes # 响应消息及短信相关
-from .modles import user_isExist, user_registered, user_checkPWD, user_chgpwd # 用户相关
-from .modles import house_get, monitor_get, monitor_chk, monitor_open, disable_safties, token_add #其它
+from flask import render_template, request
+
+from app import logger
 from config import CONFIG
+
+from . import mobile
+from .modles import (RETURN, SMSTYPE, disable_safties, house_get, monitor_chk,
+                     monitor_get, monitor_open, sms_check, sms_reqIsRepeat,
+                     sms_reqNoTimes, sms_send, token_add, user_checkPWD,
+                     user_chgpwd, user_isExist, user_registered)
+
 
 @mobile.route('/SendSMS', methods=['GET', 'POST'])  # 发送短信验证码
 def SendSMS():
@@ -13,6 +18,7 @@ def SendSMS():
     phone = args.get('id', None)
     typee = args.get('type', SMSTYPE.REGT)
 
+    logger.info("BEGIN: phone=[%s],typee=[%s]", phone, typee)
     ret=RETURN.SYSERR
     if phone is None:
         ret = RETURN.PARMERR
@@ -30,6 +36,7 @@ def SendSMS():
         elif typee == SMSTYPE.PWD:
             ret = sms_send(phone, CONFIG.SMS_TMPL_PWD)
 
+    logger.info("END  : ret=[%s]", ret)
     return json.dumps(ret, ensure_ascii=False)
 
 
@@ -40,6 +47,7 @@ def AddUser():
     pwd = args.get('pwd', None)
     code = args.get('smsCode', None)
 
+    logger.info("BEGIN: phone=[%s],pwd=[%s],code=[%s]", phone, pwd, code)
     ret=RETURN.SYSERR
     if not (phone and pwd and code):    # 参数错误
         ret = RETURN.PARMERR
@@ -49,6 +57,7 @@ def AddUser():
         ret = RETURN.SMSCHKERR
     else:
         ret = user_registered(phone, pwd)
+    logger.info("END  : ret=[%s]", ret)
     return json.dumps(ret, ensure_ascii=False)
 
 
@@ -58,6 +67,7 @@ def MyHouse():
     phone = args.get('id', None)
     pwd = args.get('pwd', None)
 
+    logger.info("BEGIN: phone=[%s],pwd=[%s]", phone, pwd)
     ret=RETURN.SYSERR
     if not (phone and pwd and pwd):    # 参数错误
         ret = RETURN.PARMERR
@@ -66,6 +76,7 @@ def MyHouse():
     else:
         ret = house_get(phone)
 
+    logger.info("END  : ret=[%s]", ret)
     return json.dumps(ret, ensure_ascii=False)
 
 
@@ -75,6 +86,7 @@ def Monitor():
     phone = args.get('id', None)
     pwd = args.get('pwd', None)
 
+    logger.info("BEGIN: phone=[%s],pwd=[%s]", phone, pwd)
     ret=RETURN.SYSERR
     if not (phone and pwd and pwd):    # 参数错误
         ret = RETURN.PARMERR
@@ -83,6 +95,7 @@ def Monitor():
     else:
         ret = monitor_get(phone)
 
+    logger.info("END  : ret=[%s]", ret)
     return json.dumps(ret, ensure_ascii=False)
 
 @mobile.route('/ChgPwd', methods=['GET', 'POST'])  # 更改密码
@@ -92,6 +105,7 @@ def ChgPwd():
     pwd = args.get('pwd', None)
     newpwd = args.get('newPwd', None)
 
+    logger.info("BEGIN: phone=[%s],pwd=[%s],newpwd=[%s]", phone, pwd, newpwd)
     ret=RETURN.SYSERR
     if not (phone and pwd and newpwd):    # 参数错误
         ret = RETURN.PARMERR
@@ -101,6 +115,7 @@ def ChgPwd():
         ret = RETURN.PWDERR # 密码错误
     else:
         ret = user_chgpwd(phone, newpwd)
+    logger.info("END  : ret=[%s]", ret)
     return json.dumps(ret, ensure_ascii=False)
 
 @mobile.route('/FindPwd', methods=['GET', 'POST'])  # 密码找回
@@ -110,6 +125,7 @@ def FindPwd():
     pwd = args.get('pwd', None)
     code = args.get('smsCode', None)
 
+    logger.info("BEGIN: phone=[%s],pwd=[%s],code=[%s]", phone, pwd, code)
     ret=RETURN.SYSERR
     if not (phone and pwd and code):    # 参数错误
         ret = RETURN.PARMERR
@@ -119,6 +135,7 @@ def FindPwd():
         ret = RETURN.SMSCHKERR
     else:
         ret = user_chgpwd(phone, pwd)
+    logger.info("END  : ret=[%s]", ret)
     return json.dumps(ret, ensure_ascii=False)
 
 @mobile.route('/Opendoor', methods=['GET', 'POST'])  # 二维码开锁
@@ -128,6 +145,7 @@ def Opendoor():
     pwd = args.get('pwd', None)
     sip = args.get('sip', None)
 
+    logger.info("BEGIN: phone=[%s],pwd=[%s],sip=[%s]", phone, pwd, sip)
     ret=RETURN.SYSERR
     if not (phone and pwd and sip):    # 参数错误
         ret = RETURN.PARMERR
@@ -139,6 +157,7 @@ def Opendoor():
         ret = RETURN.MNITNOEXIT
     else:
         ret = monitor_open(sip)
+    logger.info("END  : ret=[%s]", ret)
     return json.dumps(ret, ensure_ascii=False)
 
 @mobile.route('/DisableSafties', methods=['GET', 'POST'])  # 撤防
@@ -153,6 +172,7 @@ def DisableSafties():
     communityID = args.get('communityID', None)
     communityName = args.get('communityName', None)
 
+    logger.info("BEGIN: phone=[%s],pwd=[%s],addr=[%s],time=[%s],typee=[%s],action=[%s],communityID=[%s],communityName=[%s]", phone, pwd, addr, time, typee, action, communityID, communityName)
     ret=RETURN.SYSERR
     if not (phone and pwd and addr and time and typee and action and communityID):    # 参数错误
         ret = RETURN.PARMERR
@@ -165,6 +185,7 @@ def DisableSafties():
         #    return json.dumps(status, ensure_ascii=False)
         # 回调中返回结果
         ret = disable_safties(phone, communityID, communityName, addr, time, typee, action)
+    logger.info("END  : ret=[%s]", ret)
     return json.dumps(ret, ensure_ascii=False)
 
 @mobile.route('/GetDeviceToken', methods=['GET', 'POST'])  # 获取token码, 需要APP判断token码是否发生变化。无变化不需要发送过来
@@ -176,6 +197,7 @@ def GetDeviceToken():
     token = args.get('token', None).replace(' ', '')
     uuid = args.get('uuid', None)
 
+    logger.info("BEGIN: phone=[%s],pwd=[%s],tokenType=[%s],token=[%s],uuid=[%s]", phone, pwd, tokenType, token, uuid)
     ret = RETURN.SYSERR
     if not (phone and pwd and tokenType and token and uuid):    # 参数错误
         ret = RETURN.PARMERR
@@ -185,4 +207,5 @@ def GetDeviceToken():
         ret = RETURN.PWDERR # 密码错误
     else:
         ret = token_add(phone, tokenType, token, uuid)
+    logger.info("END  : ret=[%s]", ret)
     return json.dumps(ret, ensure_ascii=False)

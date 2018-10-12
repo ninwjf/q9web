@@ -9,6 +9,7 @@ import logging, logging.config
 from config import CONFIG
 
 logging.config.dictConfig(CONFIG.LOGCONFIG)
+logger = logging.getLogger("__name__")
 class Config(object):
     JOBS = CONFIG.JOBS
     # 加入以下参数 启动时，如果任务已经存在数据库中会报错

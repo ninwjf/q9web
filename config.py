@@ -51,7 +51,7 @@ class CONFIG():
 	'formatters': { # 日志格式
 		# 每个 formatters 由一个 format 和一个 datefmt 组成，默认值为None
 		'verbose': {
-			'format': "[%(asctime)s] %(levelname)-8s [%(name)s:%(module)s:%(filename)s:%(lineno)s] (%(process)s-%(processName)s:%(thread)s-%(threadName)s)\n%(message)s",
+			'format': "    [%(asctime)s] %(levelname)-8s [%(module)s:%(lineno)s] (%(process)s-%(processName)s:%(thread)s-%(threadName)s)\n%(funcName)-10s:%(message)s",
 			# 'datefmt': "%Y-%m-%d %H:%M:%S" 使用默认日期格式
 		},
 		'simple': {
@@ -78,7 +78,7 @@ class CONFIG():
             # 'filters': [allow_foo]	可选, 过滤器ID
             'stream': "ext://sys.stdout",	#可选
 		},
-		'file': {
+		'q9': {
 			'class': 'logging.handlers.RotatingFileHandler',	#线程安全, 进程不安全
 			'formatter': 'verbose',
 			'level': 'DEBUG',
@@ -87,7 +87,7 @@ class CONFIG():
 			'maxBytes': 1024*1024*10,	#可选,当达到10MB时分割日志
 			'backupCount': 50,	#可选,最多保留50份文件
 		},
-		'ferr': {
+		'q9_err': {
 			'class': 'logging.handlers.RotatingFileHandler',	
 			#进程安全的 需要安装 pip install ConcurrentLogHandler
 			#如果没有使用并发的日志处理类，在多实例的情况下日志会出现缺失'class': 'cloghandler.ConcurrentRotatingFileHandler',
@@ -103,7 +103,7 @@ class CONFIG():
 	},
 	'loggers': {	# 记录器
 		'__name__': {
-			'handlers': ['file', 'ferr', 'console'],
+			'handlers': ['q9', 'q9_err', 'console'],
 			'level': 'INFO',
             # 'filters': [allow_foo]	可选, 过滤器ID
 			#'propagate': '', #可选,传播设置  1表示消息必须从此记录器传播到记录器层次结构上方的处理程序，或者0表示消息不会传播到层次结构中的处理程序

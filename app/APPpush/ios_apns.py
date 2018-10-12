@@ -1,6 +1,9 @@
 from apns2.client import APNsClient, Notification
 from apns2.payload import Payload
+
+from app import logger
 from config import CONFIG
+
 
 class Msg_Type():
     # IM 消息   IC 呼叫
@@ -15,6 +18,11 @@ class Msg_Cmd():
 
 iosClient = APNsClient('developent2.pem', use_sandbox= CONFIG.DEBUG)
 
+def pushIOS(notifications):
+    logger.info("BEGIN: notifications=[%s]", notifications)
+    iosClient.send_notification_batch(notifications, topic = 'com.guson.q8.voip')
+    logger.info("END  : notifications=[%s]", notifications)
+
 def pushCallIOS(tokens, community, site):
 	notification = {
                 "loc-key": Msg_Type.IC,
@@ -23,7 +31,7 @@ def pushCallIOS(tokens, community, site):
                 "device-name": site
             }
 	notifications = [Notification(token=token, payload=Payload(alert=notification)) for token in tokens]
-	iosClient.send_notification_batch(notifications, topic = 'com.guson.q8.voip')
+	pushIOS(notifications)
 
 def pushInfoIOS(tokens, community, site):
 	notification = {
@@ -33,7 +41,7 @@ def pushInfoIOS(tokens, community, site):
                 "device-name": site
             }
 	notifications = [Notification(token=token, payload=Payload(alert=notification)) for token in tokens]
-	iosClient.send_notification_batch(notifications, topic = 'com.guson.q8.voip')
+	pushIOS(notifications)
 	
 def pushSecurityIOS(tokens, community, site):
 	notification = {
@@ -43,4 +51,4 @@ def pushSecurityIOS(tokens, community, site):
                 "device-name": site
             }
 	notifications = [Notification(token=token, payload=Payload(alert=notification)) for token in tokens]
-	iosClient.send_notification_batch(notifications, topic = 'com.guson.q8.voip')
+	pushIOS(notifications)

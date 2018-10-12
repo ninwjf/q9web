@@ -2,17 +2,19 @@ from threading import Lock
 from flask import session, request
 from flask_socketio import Namespace, emit, join_room, rooms, leave_room, close_room, disconnect
 
-from app import socketio
+from app import socketio, logger
 
 q8i_count = 0
 
+# 暂时只有 撤防 功能 通过 send2Q8i发送
 class MSGTYPE():
     Disarm = "Disarm"   # 撤防
 
 def send2Q8i(msgType, msgJson, func = None):
     if msgJson['communityID']:
+        logger.info("BEGIN: msgType=[%s],msgJson=[%s]", msgType, msgJson)
         socketio.emit(msgType, msgJson, room=msgJson['communityID'], callback=func, namespace='/sio_q8i')
-        print(msgType, msgJson)
+        logger.info("END  : msgType=[%s],msgJson=[%s]", msgType, msgJson)
     
 class Q8INamespace(Namespace):
     def on_connect(self):

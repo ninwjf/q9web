@@ -1,9 +1,14 @@
-import datetime, random, uuid, json
+import datetime
+import json
+import random
+import uuid
 
-from tables import db, STAT, User, Sms, MyHouse, Monitor, DeciveTYPE, SiteToName, Token
+from app.sioServer.modles import MSGTYPE, send2Q8i
+from app.tables import (STAT, DeciveTYPE, Monitor, MyHouse, SiteToName, Sms,
+                        Token, User, db)
 from config import CONFIG
 from dysms_python.demo_sms_send import send_sms
-from app.sioServer.modles import send2Q8i, MSGTYPE
+
 
 class SMSTYPE():
     ''' 短信类型 0 注册 1 找回密码'''
