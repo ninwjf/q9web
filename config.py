@@ -43,6 +43,7 @@ class CONFIG():
 
     # 日志配置 https://docs.python.org/3/library/logging.config.html
     LOGPATH = '/home/web/log/' if sysName == "Linux" else 'log/'
+    # NEWLINE = '\n' if sysName == "Linux" else '\r\n'
     LOGCONFIG = {
 	'version': 1,   # 表示模式版本的整数值。目前唯一有效的值是1
 	'disable_existing_loggers': True,   # 默认 True 禁用任何现有记录器
@@ -50,7 +51,7 @@ class CONFIG():
 	'formatters': { # 日志格式
 		# 每个 formatters 由一个 format 和一个 datefmt 组成，默认值为None
 		'verbose': {
-			'format': "[%(asctime)s] %(levelname)-8s [%(name)s:%(module)s:%(filename)s:%(lineno)s] (%(process)s-%(processName)s:%(thread)s-%(threadName)s)\r%(message)s",
+			'format': "[%(asctime)s] %(levelname)-8s [%(name)s:%(module)s:%(filename)s:%(lineno)s] (%(process)s-%(processName)s:%(thread)s-%(threadName)s)\n%(message)s",
 			# 'datefmt': "%Y-%m-%d %H:%M:%S" 使用默认日期格式
 		},
 		'simple': {
