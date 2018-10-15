@@ -1,5 +1,5 @@
 # encoding: utf-8
-import os, platform
+import os, platform, logging
 
 """敏感信息使用可以考虑带入dotenv
 from dotenv import load_dotenv
@@ -9,6 +9,23 @@ load_dotenv(os.path.join(basedir, '.env'))
 
 """
 sysName = platform.system()
+
+class fsFilter(logging.Filter):
+	def filter(self, record):
+		if 'fs_views' in record.module:
+			return True
+		if 'ios_apns' in record.module:
+			return True
+		return False
+
+class moduleFilter(logging.Filter):
+	def __init__(self, param=None):
+		self.param = param
+
+	def filter(self, record):
+		if self.param is None:
+			return True
+		return self.param in record.module
 
 class CONFIG():
     #调试模式
@@ -42,8 +59,8 @@ class CONFIG():
     ]
 
     # 日志配置 https://docs.python.org/3/library/logging.config.html
-    LOGPATH = '/home/web/log/' if sysName == "Linux" else 'log/'
     # NEWLINE = '\n' if sysName == "Linux" else '\r\n'
+    LOGPATH = '/home/web/log/' if sysName == "Linux" else 'log/'
     LOGCONFIG = {
 	'version': 1,   # 表示模式版本的整数值。目前唯一有效的值是1
 	'disable_existing_loggers': True,   # 默认 True 禁用任何现有记录器
@@ -51,18 +68,34 @@ class CONFIG():
 	'formatters': { # 日志格式
 		# 每个 formatters 由一个 format 和一个 datefmt 组成，默认值为None
 		'verbose': {
-			'format': "    [%(asctime)s] %(levelname)-8s [%(module)s:%(lineno)s] (%(process)s-%(processName)s:%(thread)s-%(threadName)s)\n[%(funcName)s]%(message)s",
+			'format': "[%(asctime)s %(process)s:%(thread)s]%(levelname)-5s[%(funcName)s]%(message)s",
 			# 'datefmt': "%Y-%m-%d %H:%M:%S" 使用默认日期格式
 		},
 		'simple': {
 			'format': ""
 		},
 		'thread': {
-			'format': "[%(asctime)s] %(levelname)-8s [%(name)s:%(filename)s:%(lineno)s] (%(process)d:%(thread)d) %(message)s",
+			'format': "[%(asctime)s] %(levelname)-5s [%(name)s:%(filename)s:%(lineno)s] (%(process)d:%(thread)d) %(message)s",
 		}
 	},
-	'filters': { # 过滤器
-		# 待研究
+    'filters': {	# 过滤器
+        'fsFilter': {
+            #'()': 'ext://config.fsFilter',	# 自定义类名 #通过ext://project.util.owned_file_handler 指定项目位置
+            '()': 'ext://config.moduleFilter',	# 自定义类名
+            'param': 'fs_views',	# 可选, 类初始化参数 
+        },
+        'appFilter': {
+            '()': 'ext://config.moduleFilter',	# 自定义类名
+            'param': 'app_views',	# 可选, 类初始化参数 
+        },
+        'q8iFilter': {
+            '()': 'ext://config.moduleFilter',	# 自定义类名
+            'param': 'q8i_views',	# 可选, 类初始化参数 
+        },
+        'IOSpushFilter': {
+            '()': 'ext://config.moduleFilter',	# 自定义类名
+            'param': 'ios_apns',	# 可选, 类初始化参数 
+        },
 	},
 	'handlers': {   # 处理器
 		'null': {
@@ -83,7 +116,7 @@ class CONFIG():
 			'formatter': 'verbose',
 			'level': 'DEBUG',
 			'filename': LOGPATH + 'q9.log',
-            'encoding': 'utf-8',	# 默认
+            'encoding': 'utf-8',	# 字符集
 			'maxBytes': 1024*1024*10,	#可选,当达到10MB时分割日志
 			'backupCount': 50,	#可选,最多保留50份文件
 		},
@@ -100,10 +133,50 @@ class CONFIG():
 			'maxBytes': 1024*1024*10,	#可选,当达到10MB时分割日志
 			'backupCount': 50,	#可选,最多保留50份文件
 		},
+		'freeswitch': {	# fs短信及呼叫日志
+			'class': 'logging.handlers.RotatingFileHandler',	
+			'formatter': 'verbose',		#可选, 格式化程序ID
+			'level': 'DEBUG',			#可选, 日志级别
+            'filters': ['fsFilter'],	# [allow_foo]	可选, 过滤器ID
+			'filename': LOGPATH + 'fs_plan.log',
+            'encoding': 'utf-8',	# 字符集
+			'maxBytes': 1024*1024*10,	#可选,当达到10MB时分割日志
+			'backupCount': 50,	#可选,最多保留50份文件
+		},
+		'app': {	# fs短信及呼叫日志
+			'class': 'logging.handlers.RotatingFileHandler',	
+			'formatter': 'verbose',		#可选, 格式化程序ID
+			'level': 'DEBUG',			#可选, 日志级别
+            'filters': ['appFilter'],	# [allow_foo]	可选, 过滤器ID
+			'filename': LOGPATH + 'app.log',
+            'encoding': 'utf-8',	# 字符集
+			'maxBytes': 1024*1024*10,	#可选,当达到10MB时分割日志
+			'backupCount': 50,	#可选,最多保留50份文件
+		},
+		'q8i': {	# fs短信及呼叫日志
+			'class': 'logging.handlers.RotatingFileHandler',	
+			'formatter': 'verbose',		#可选, 格式化程序ID
+			'level': 'DEBUG',			#可选, 日志级别
+            'filters': ['q8iFilter'],	# [allow_foo]	可选, 过滤器ID
+			'filename': LOGPATH + 'q8i.log',
+            'encoding': 'utf-8',	# 字符集
+			'maxBytes': 1024*1024*10,	#可选,当达到10MB时分割日志
+			'backupCount': 50,	#可选,最多保留50份文件
+		},
+		'IOSpush': {	# fs短信及呼叫日志
+			'class': 'logging.handlers.RotatingFileHandler',	
+			'formatter': 'verbose',		#可选, 格式化程序ID
+			'level': 'DEBUG',			#可选, 日志级别
+            'filters': ['IOSpushFilter'],	# [allow_foo]	可选, 过滤器ID
+			'filename': LOGPATH + 'IOSpush.log',
+            'encoding': 'utf-8',	# 字符集
+			'maxBytes': 1024*1024*10,	#可选,当达到10MB时分割日志
+			'backupCount': 50,	#可选,最多保留50份文件
+		},
 	},
 	'loggers': {	# 记录器
 		'__name__': {
-			'handlers': ['q9', 'q9_err', 'console'],
+			'handlers': ['q9', 'q9_err', 'console', 'freeswitch', 'app', 'q8i', 'IOSpush'],
 			'level': 'INFO',
             # 'filters': [allow_foo]	可选, 过滤器ID
 			#'propagate': '', #可选,传播设置  1表示消息必须从此记录器传播到记录器层次结构上方的处理程序，或者0表示消息不会传播到层次结构中的处理程序

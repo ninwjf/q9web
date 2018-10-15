@@ -10,4 +10,4 @@ import logging
 freeswitch = Blueprint('freeswitch', __name__, template_folder='./templates')
 
 
-from app.freeswitch import views
+from app.freeswitch import fs_views

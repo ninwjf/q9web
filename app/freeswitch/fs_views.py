@@ -3,7 +3,7 @@ from flask import render_template, request
 from app import logger
 
 from . import freeswitch
-from .modles import PushCALL, ipPort_get, phones_get, user_getPWD
+from .fs_modles import PushCALL, ipPort_get, phones_get, user_getPWD
 
 
 @freeswitch.route('/fsuser', methods=['GET', 'POST'])
@@ -24,15 +24,19 @@ def fsplan():   # 执行计划
     callee = args.get('Caller-Destination-Number', None)
     callfr = args.get('Caller-Username', None)
 
-    logger.info("BEGIN: [%s]呼叫[%s]", callfr, callee)
 
     # 呼叫推送服务
     PushCALL(callee[3:] if callee[:3] == "Cam" else callee)
 
     if callee[:3] == "Cam": # 监控请求
-        to_ip, to_port = ipPort_get(callee[3:])
+        try:
+            to_ip, to_port = ipPort_get(callee[3:])
+            logger.info("[%s]监视[%s] IP=[%s],PORT=[%s]", callfr, callee, to_ip, to_port)
+        except:
+            logger.warn('WARN: [%s]监视[%s],[%s]不在线,监视失败', callfr, callee, callee)
         bridges = "sofia/internal/camera@%s:%s" % (to_ip, to_port)
     else:   # 呼叫请求
+        logger.info("BEGIN: [%s]呼叫[%s]", callfr, callee)
         phones = phones_get(callee)
         first = True
         for i in phones:
@@ -41,7 +45,7 @@ def fsplan():   # 执行计划
                 bridges = "user/" + i + "@${domain_name}"
             else:
                 bridges += ", user/" + i + "@${domain_name}"
-    logger.info("END  : [%s]呼叫[%s] bridges=[%s]", callfr, callee, bridges)
+        logger.info("END  : [%s]呼叫[%s] bridges=[%s]", callfr, callee, bridges)
     return render_template("dialplan.html", bridges = bridges)
 
 @freeswitch.route('/chatplan', methods=['GET', 'POST'])
@@ -62,5 +66,5 @@ def chatplan(): # 短信发送配置
         to_ip, to_port = ipPort_get(sendto)
         logger.info("END  : [%s]发送消息给[%s] IP=[%s],PORT=[%s]", sendfr, sendto, to_ip, to_port)
     except:
-        logger.error('WARN  : [%s]发送消息给[%s],[%s]不在线,发送失败')
+        logger.warn('WARN : [%s]发送消息给[%s],[%s]不在线,发送失败', sendfr, sendto, sendto)
     return render_template("chatplan.html", to_sip_ip = to_ip, to_sip_port = to_port)

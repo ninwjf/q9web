@@ -19,9 +19,8 @@ class Msg_Cmd():
 iosClient = APNsClient('developent2.pem', use_sandbox= CONFIG.DEBUG)
 
 def pushIOS(notifications):
-    logger.info("BEGIN: notifications=[%s]", notifications)
-    iosClient.send_notification_batch(notifications, topic = 'com.guson.q8.voip')
-    logger.info("END  : notifications=[%s]", notifications)
+    ret = iosClient.send_notification_batch(notifications, topic = 'com.guson.q8.voip')
+    logger.info("ret=[%s], notifications=[%s]", ret, notifications)
 
 def pushCallIOS(tokens, community, site):
 	notification = {

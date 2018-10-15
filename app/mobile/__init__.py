@@ -7,4 +7,4 @@ from flask import Blueprint
 
 mobile = Blueprint('mobile', __name__, template_folder='./templates')
 
-from app.mobile import views
+from app.mobile import app_views
