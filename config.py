@@ -51,7 +51,7 @@ class CONFIG():
 	'formatters': { # 日志格式
 		# 每个 formatters 由一个 format 和一个 datefmt 组成，默认值为None
 		'verbose': {
-			'format': "    [%(asctime)s] %(levelname)-8s [%(module)s:%(lineno)s] (%(process)s-%(processName)s:%(thread)s-%(threadName)s)\n%([funcName)s]%(message)s",
+			'format': "    [%(asctime)s] %(levelname)-8s [%(module)s:%(lineno)s] (%(process)s-%(processName)s:%(thread)s-%(threadName)s)\n[%(funcName)s]%(message)s",
 			# 'datefmt': "%Y-%m-%d %H:%M:%S" 使用默认日期格式
 		},
 		'simple': {
