@@ -10,13 +10,9 @@ load_dotenv(os.path.join(basedir, '.env'))
 """
 sysName = platform.system()
 
-class fsFilter(logging.Filter):
+class debugFilter(logging.Filter):
 	def filter(self, record):
-		if 'fs_views' in record.module:
-			return True
-		if 'ios_apns' in record.module:
-			return True
-		return False
+		return CONFIG.DEBUG
 
 class moduleFilter(logging.Filter):
 	def __init__(self, param=None):
@@ -79,6 +75,9 @@ class CONFIG():
 		}
 	},
     'filters': {	# 过滤器
+		'debugFilter': {
+			'()': 'ext://config.debugFilter',
+		},
         'fsFilter': {
             #'()': 'ext://config.fsFilter',	# 自定义类名 #通过ext://project.util.owned_file_handler 指定项目位置
             '()': 'ext://config.moduleFilter',	# 自定义类名
@@ -108,8 +107,9 @@ class CONFIG():
 			'class': 'logging.StreamHandler',
 			'formatter': 'verbose',		#可选, 格式化程序ID
 			'level': 'DEBUG',			#可选, 日志级别
+            'filters': ['debugFilter'],	# [allow_foo]	可选, 过滤器ID
             # 'filters': [allow_foo]	可选, 过滤器ID
-            'stream': "ext://sys.stdout",	#可选
+            # 'stream': "ext://sys.stdout",	#可选
 		},
 		'q9': {
 			'class': 'logging.handlers.RotatingFileHandler',	#线程安全, 进程不安全
