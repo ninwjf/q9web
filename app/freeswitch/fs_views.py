@@ -24,10 +24,6 @@ def fsplan():   # 执行计划
     callee = args.get('Caller-Destination-Number', None)
     callfr = args.get('Caller-Username', None)
 
-
-    # 呼叫推送服务
-    PushCALL(callee[3:] if callee[:3] == "Cam" else callee)
-
     if callee[:3] == "Cam": # 监控请求
         try:
             to_ip, to_port = ipPort_get(callee[3:])
@@ -37,14 +33,13 @@ def fsplan():   # 执行计划
         bridges = "sofia/internal/camera@%s:%s" % (to_ip, to_port)
     else:   # 呼叫请求
         logger.info("BEGIN: [%s]呼叫[%s]", callfr, callee)
+        # 呼叫推送服务
+        PushCALL(callee)
         phones = phones_get(callee)
-        first = True
+        bridges = ""
         for i in phones:
-            if first:
-                first = False
-                bridges = "user/" + i + "@${domain_name}"
-            else:
-                bridges += ", user/" + i + "@${domain_name}"
+            bridges += ", user/" + i + "@${domain_name}"
+        bridges = bridges[2:]
         logger.info("END  : [%s]呼叫[%s] bridges=[%s]", callfr, callee, bridges)
     return render_template("dialplan.html", bridges = bridges)
 
