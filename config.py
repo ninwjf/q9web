@@ -21,7 +21,7 @@ class moduleFilter(logging.Filter):
 	def filter(self, record):
 		if self.param is None:
 			return True
-		return self.param in record.module
+		return record.module in self.param
 
 class CONFIG():
     #调试模式
@@ -81,19 +81,23 @@ class CONFIG():
         'fsFilter': {
             #'()': 'ext://config.fsFilter',	# 自定义类名 #通过ext://project.util.owned_file_handler 指定项目位置
             '()': 'ext://config.moduleFilter',	# 自定义类名
-            'param': 'fs_views',	# 可选, 类初始化参数 
+            'param': ['fs_views', 'fs_modles'],	# 可选, 类初始化参数 
         },
         'appFilter': {
             '()': 'ext://config.moduleFilter',	# 自定义类名
-            'param': 'app_views',	# 可选, 类初始化参数 
+            'param': ['app_views'],	# 可选, 类初始化参数 
         },
         'q8iFilter': {
             '()': 'ext://config.moduleFilter',	# 自定义类名
-            'param': 'q8i_views',	# 可选, 类初始化参数 
+            'param': ['q8i_views', 'sio_modles'],	# 可选, 类初始化参数 
         },
         'IOSpushFilter': {
             '()': 'ext://config.moduleFilter',	# 自定义类名
-            'param': 'ios_apns',	# 可选, 类初始化参数 
+            'param': ['ios_apns'],	# 可选, 类初始化参数 
+        },
+        'sioFilter': {
+            '()': 'ext://config.moduleFilter',	# 自定义类名
+            'param': ['sio_modles'],	# 可选, 类初始化参数 
         },
 	},
 	'handlers': {   # 处理器
@@ -173,10 +177,20 @@ class CONFIG():
 			'maxBytes': 1024*1024*10,	#可选,当达到10MB时分割日志
 			'backupCount': 50,	#可选,最多保留50份文件
 		},
+		'sio': {	# fs短信及呼叫日志
+			'class': 'logging.handlers.RotatingFileHandler',	
+			'formatter': 'verbose',		#可选, 格式化程序ID
+			'level': 'DEBUG',			#可选, 日志级别
+            'filters': ['sioFilter'],	# [allow_foo]	可选, 过滤器ID
+			'filename': LOGPATH + 'sio.log',
+            'encoding': 'utf-8',	# 字符集
+			'maxBytes': 1024*1024*10,	#可选,当达到10MB时分割日志
+			'backupCount': 50,	#可选,最多保留50份文件
+		},
 	},
 	'loggers': {	# 记录器
 		'__name__': {
-			'handlers': ['q9', 'q9_err', 'console', 'freeswitch', 'app', 'q8i', 'IOSpush'],
+			'handlers': ['q9', 'q9_err', 'console', 'freeswitch', 'app', 'q8i', 'IOSpush', 'sio'],
 			'level': 'INFO',
             # 'filters': [allow_foo]	可选, 过滤器ID
 			#'propagate': '', #可选,传播设置  1表示消息必须从此记录器传播到记录器层次结构上方的处理程序，或者0表示消息不会传播到层次结构中的处理程序

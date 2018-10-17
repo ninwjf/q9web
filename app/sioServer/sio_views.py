@@ -2,7 +2,7 @@ from flask import render_template
 
 from . import sio
 from app import socketio
-from .modles import Q8INamespace
+from .sio_modles import Q8INamespace
 
 
 #@sio.route('/')

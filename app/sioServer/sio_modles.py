@@ -18,44 +18,44 @@ def send2Q8i(msgType, msgJson, func = None):
     
 class Q8INamespace(Namespace):
     def on_connect(self):
-        print("connect", request.sid)
+        logger.info("connect ip=[%s],sid=[%s]", request.remote_addr, request.sid)
     
     def on_disconnect(self):
-        print("disconnect", request.sid)
+        logger.info("connect ip=[%s],sid=[%s]", request.remote_addr, request.sid)
 
     def on_error(self):
-        print("disconnect", request.sid)
+        logger.info("connect ip=[%s],sid=[%s]", request.remote_addr, request.sid)
 
     # 房间
     def on_JoinRoom(self, message):
         join_room(message['communityID'])
-        print("JoinRoom:", message)
+        logger.info("JoinRoom message=[%s]", message)
 
     def on_LeaveRoom(self, message):
         leave_room(message['communityID'])
-        print("LeaveRoom:", message)
+        logger.info("LeaveRoom message=[%s]", message)
 
     def on_CloseRoom(self, message):
         close_room(message['communityID'])
-        print("CloseRoom:", message)
+        logger.info("CloseRoom message=[%s]", message)
 
     # 发送消息部分
     def on_msg(self, message):
         emit('SevMsg', message)
-        print("msg:", message)
+        logger.info("SevMsg message=[%s]", message)
 
     def on_broadcast_msg(self, message):
         emit('SevMsg', message, broadcast=True)
-        print("broadcast msg:", message)
+        logger.info("broadcast message=[%s]", message)
 
     def on_MsgToRoom(self, message):
-        print("MsgToRoom:", message)
+        logger.info("MsgToRoom message=[%s]", message)
         emit('SevMsg', message, room=message['communityID'])
 
     def on_RoomList(self):
         roomList = rooms()
         emit('SevMsg', roomList)
-        print("rooms:", roomList)
+        logger.info("RoomList roomList=[%s]", roomList)
 
 '''
 thread = None
