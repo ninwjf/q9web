@@ -36,7 +36,7 @@ def create_app():
     # scheduler.init_app(app)
     # scheduler.start()
 
-    socketio.init_app(app=app, async_mode=async_mode)
+    socketio.init_app(app=app, message_quere='redis://')
 
     from app.mobile import mobile
     from app.freeswitch import freeswitch
