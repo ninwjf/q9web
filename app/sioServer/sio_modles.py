@@ -18,25 +18,28 @@ def send2Q8i(msgType, msgJson, func = None):
     
 class Q8INamespace(Namespace):
     def on_connect(self):
-        logger.info("connect ip=[%s],sid=[%s]", request.remote_addr, request.sid)
+        logger.info("connect ip=[%s],sid=[%s]", request.headers['X-Forwarded-For'] , request.sid)
     
     def on_disconnect(self):
-        logger.info("connect ip=[%s],sid=[%s]", request.remote_addr, request.sid)
+        logger.info("connect ip=[%s],sid=[%s]", request.headers['X-Forwarded-For'] , request.sid)
 
     def on_error(self):
-        logger.info("connect ip=[%s],sid=[%s]", request.remote_addr, request.sid)
+        logger.info("connect ip=[%s],sid=[%s]", request.headers['X-Forwarded-For'] , request.sid)
 
     # 房间
     def on_JoinRoom(self, message):
         join_room(message['communityID'])
+        emit('SevMsg', message)
         logger.info("JoinRoom message=[%s]", message)
 
     def on_LeaveRoom(self, message):
         leave_room(message['communityID'])
+        emit('SevMsg', message)
         logger.info("LeaveRoom message=[%s]", message)
 
     def on_CloseRoom(self, message):
         close_room(message['communityID'])
+        emit('SevMsg', message)
         logger.info("CloseRoom message=[%s]", message)
 
     # 发送消息部分
