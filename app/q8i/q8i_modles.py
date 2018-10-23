@@ -92,7 +92,7 @@ def comny_chgPwd(account, pwd, newPwd, st = STAT.OPEN):
 def fs_sendChat(community, msg, dir, st = STAT.OPEN):
     # 获取推送列表
     pushs = db.session.query(MyHouse.phone, MyHouse.community, Token.token).filter(community == MyHouse.communityID, dir == MyHouse.site, st == MyHouse.status,
-        MyHouse.phone == Token.phone, Token.tokenType == TokenType.IOS_VOIP).all()
+        MyHouse.phone == Token.phone, Token.tokenType == TokenType.IOS_VOIP, Token.status = STAT.OPEN).all()
     tokens = []
     for i in pushs:
         tokens.append(i.token)

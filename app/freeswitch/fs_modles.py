@@ -27,7 +27,7 @@ def PushCALL(sip):
     由于在线状态不准确，无法根据在线状态判断是否推送，所以全都推送，后期有时间可优化 '''
     # 获取所有关联用户 且 有相关推送信息
     bridges = db.session.query(MyHouse.phone, MyHouse.community, MyHouse.site, MyHouse.site, Token.token).filter(MyHouse.sip == sip, MyHouse.status == STAT.OPEN, 
-        Token.phone == MyHouse.phone, Token.tokenType == TokenType.IOS_VOIP).all()
+        Token.phone == MyHouse.phone, Token.tokenType == TokenType.IOS_VOIP, Token.status = STAT.OPEN).all()
     tokens = []
 
     for i in bridges:
