@@ -216,3 +216,14 @@ def token_add(phone, tokenType, token, uuid, dt=datetime.datetime.now(), st=STAT
     db.session.commit()
 
     return RETURN.SUCC
+
+def log_out(phone):
+    ''' 添加IOS设备deviceToken '''
+    tok = Token.query.filter(phone == Token.phone).first()
+    if tok is  None:
+        tok = Token()
+    tok.status = STAT.LOCK
+    db.session.add(tok)
+    db.session.commit()
+
+    return RETURN.SUCC

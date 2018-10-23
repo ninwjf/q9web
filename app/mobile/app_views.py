@@ -6,10 +6,11 @@ from app import logger
 from config import CONFIG
 
 from . import mobile
-from .app_modles import (RETURN, SMSTYPE, disable_safties, house_get, monitor_chk,
-                     monitor_get, monitor_open, sms_check, sms_reqIsRepeat,
-                     sms_reqNoTimes, sms_send, token_add, user_checkPWD,
-                     user_chgpwd, user_isExist, user_registered)
+from .app_modles import (RETURN, SMSTYPE, log_out, disable_safties, house_get,
+                         monitor_chk, monitor_get, monitor_open, sms_check,
+                         sms_reqIsRepeat, sms_reqNoTimes, sms_send, token_add,
+                         user_checkPWD, user_chgpwd, user_isExist,
+                         user_registered)
 
 
 @mobile.route('/SendSMS', methods=['GET', 'POST'])  # 发送短信验证码
@@ -207,5 +208,24 @@ def GetDeviceToken():
         ret = RETURN.PWDERR # 密码错误
     else:
         ret = token_add(phone, tokenType, token, uuid)
+    logger.info("END  : ret=[%s]", ret)
+    return json.dumps(ret, ensure_ascii=False)
+
+@mobile.route('/logout', methods=['GET', 'POST'])  # 获取token码, 需要APP判断token码是否发生变化。无变化不需要发送过来
+def logout():
+    args = request.args if request.method == 'GET' else request.form
+    phone = args.get('id', None)
+    pwd = args.get('pwd', None)
+
+    logger.info("BEGIN: phone=[%s],pwd=[%s]", phone, pwd)
+    ret = RETURN.SYSERR
+    if not (phone and pwd):    # 参数错误
+        ret = RETURN.PARMERR
+    elif not user_isExist(phone):    # 用户不存在
+        ret = RETURN.NOTEXIST
+    elif not user_checkPWD(phone, pwd):
+        ret = RETURN.PWDERR # 密码错误
+    else:
+        ret = log_out(phone)
     logger.info("END  : ret=[%s]", ret)
     return json.dumps(ret, ensure_ascii=False)
