@@ -198,6 +198,7 @@ def GetDeviceToken():
     token = args.get('token', None)
     uuid = args.get('uuid', None)
 
+    token = token.replace(' ', '')
     logger.info("BEGIN: phone=[%s],pwd=[%s],tokenType=[%s],token=[%s],uuid=[%s]", phone, pwd, tokenType, token, uuid)
     ret = RETURN.SYSERR
     if not (phone and pwd and tokenType and token and uuid):    # 参数错误
