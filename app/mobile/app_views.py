@@ -171,7 +171,7 @@ def DisableSafties():
     typee = args.get('type', None)
     action = args.get('action', None)
     communityID = args.get('communityID', None)
-    communityName = args.get('communityName', None)
+    communityName = args.get('community', None)
 
     logger.info("BEGIN: phone=[%s],pwd=[%s],addr=[%s],time=[%s],typee=[%s],action=[%s],communityID=[%s],communityName=[%s]", phone, pwd, addr, time, typee, action, communityID, communityName)
     ret=RETURN.SYSERR
@@ -195,7 +195,7 @@ def GetDeviceToken():
     phone = args.get('id', None)
     pwd = args.get('pwd', None)
     tokenType = args.get('tokenType', None)
-    token = args.get('token', None).replace(' ', '')
+    token = args.get('token', None)
     uuid = args.get('uuid', None)
 
     logger.info("BEGIN: phone=[%s],pwd=[%s],tokenType=[%s],token=[%s],uuid=[%s]", phone, pwd, tokenType, token, uuid)
