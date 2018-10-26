@@ -2,6 +2,7 @@ import datetime
 import inspect
 import json
 import random
+import time
 
 from app.APPpush.ios_apns import pushInfoIOS, pushSecurityIOS
 from app.fs_ESL.fs_chat import send_chat
@@ -102,6 +103,7 @@ def fs_sendChat(community, msg, dir, st = STAT.OPEN):
             pushInfoIOS(tokens, pushs[0].community, SiteToName(dir))
         elif msg[0:8] == "WWAARRNN":
             pushSecurityIOS(tokens, pushs[0].community, SiteToName(dir))
+        time.sleep(3)
 
     # 获取消息发送列表
     sends = db.session.query(MyHouse.phone, MyHouse.community, Registrations.realm, Registrations.network_ip, Registrations.network_port).filter(community == MyHouse.communityID, dir == MyHouse.site, st == MyHouse.status,

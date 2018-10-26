@@ -1,3 +1,5 @@
+import time
+
 from app.APPpush.ios_apns import pushCallIOS
 from app.tables import (STAT, Monitor, MyHouse, Registrations, SiteToName,
                         Token, TokenType, User, db)
@@ -35,3 +37,4 @@ def PushCALL(sip):
     
     if len(bridges) > 0:
         pushCallIOS(tokens, bridges[0].community, bridges[0].site)
+        time.sleep(3)
