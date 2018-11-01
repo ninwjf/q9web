@@ -116,16 +116,17 @@ class CONFIG():
             # 'stream': "ext://sys.stdout",	#可选
 		},
 		'q9': {
-			'class': 'logging.handlers.RotatingFileHandler',	#线程安全, 进程不安全
+			'class': 'logging.handlers.TimedRotatingFileHandler',	# 按大小分隔
 			'formatter': 'verbose',
 			'level': 'DEBUG',
 			'filename': LOGPATH + 'q9.log',
             'encoding': 'utf-8',	# 字符集
-			'maxBytes': 1024*1024*10,	#可选,当达到10MB时分割日志
+			'when': "midnight",	# 可选,按天对日志进行分隔,S 秒, M 分, H 时, D-Days 天, midnight 半夜, W{0-6} 星期几
+			#"interval": 1,	# 默认1，结合when， 每1天对日志进行分隔
 			'backupCount': 50,	#可选,最多保留50份文件
 		},
 		'q9_err': {
-			'class': 'logging.handlers.RotatingFileHandler',	
+			'class': 'logging.handlers.TimedRotatingFileHandler',	# 按时间进行分割
 			#进程安全的 需要安装 pip install ConcurrentLogHandler
 			#如果没有使用并发的日志处理类，在多实例的情况下日志会出现缺失'class': 'cloghandler.ConcurrentRotatingFileHandler',
 			#Ifdelayistrue,
@@ -134,7 +135,8 @@ class CONFIG():
 			'level': 'ERROR',			#可选, 日志级别
             # 'filters': [allow_foo]	可选, 过滤器ID
 			'filename': LOGPATH + 'q9_err.log',
-			'maxBytes': 1024*1024*10,	#可选,当达到10MB时分割日志
+			'when': "D",	# 可选,按天对日志进行分隔, S 秒，M 分，H 时，D-Days 天，midnight 半夜，W{0-6} 星期几
+			"interval": 1,	# 默认1，结合when， 每1天对日志进行分隔
 			'backupCount': 50,	#可选,最多保留50份文件
 		},
 		'freeswitch': {	# fs短信及呼叫日志
@@ -197,3 +199,5 @@ class CONFIG():
 		},
 	}
 }
+
+logging.handlers.TimedRotatingFileHandler()

@@ -1,5 +1,3 @@
-from threading import Lock
-from flask import session, request
 from flask_socketio import Namespace, emit, join_room, rooms, leave_room, close_room, disconnect
 
 from app import socketio, logger
@@ -18,13 +16,13 @@ def send2Q8i(msgType, msgJson, func = None):
     
 class Q8INamespace(Namespace):
     def on_connect(self):
-        logger.info("connect ip=[%s],sid=[%s]", request.headers['X-Forwarded-For'] , request.sid)
+        logger.info("connect ")
     
     def on_disconnect(self):
-        logger.info("connect ip=[%s],sid=[%s]", request.headers['X-Forwarded-For'] , request.sid)
+        logger.info("disconnect ")
 
-    def on_error(self):
-        logger.info("connect ip=[%s],sid=[%s]", request.headers['X-Forwarded-For'] , request.sid)
+    def on_error(self, e):
+        logger.info("err=[%s]", e)
 
     # 房间
     def on_JoinRoom(self, message):
