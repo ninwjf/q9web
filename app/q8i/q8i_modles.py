@@ -60,7 +60,7 @@ def monitor_list(community, st = STAT.OPEN):
 
 def house_list(community, st = STAT.OPEN):
     ''' 获取小区房间列表 '''
-    houses = db.session.query(MyHouse.phone, MyHouse.site).filter(community == MyHouse.communityID, st == MyHouse.status).all()
+    houses = db.session.query(MyHouse.phone, MyHouse.site, MyHouse.name, MyHouse.sex, MyHouse.uType).filter(community == MyHouse.communityID, st == MyHouse.status).all()
     a = []
     for i in houses:
         a.append(i._asdict())
