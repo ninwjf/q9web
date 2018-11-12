@@ -1,10 +1,12 @@
-from apns2.client import APNsClient, Notification
-from apns2.payload import Payload
+import logging
 
-from app import logger
+from apns2.client import APNsClient, Notification, logger
+from apns2.payload import Payload
 from config import CONFIG
 
+log = logging.getLogger(__name__)
 
+## https://github.com/Pr0Ger/PyAPNs2
 class Msg_Type():
     # IM 消息   IC 呼叫
     IM = "IM_MSG"  # 消息
@@ -16,7 +18,7 @@ class Msg_Cmd():
     INFORMATION = "INFORMATION"  # 小区消息
     SECURITY = "SECURITY"  # 安防报警消息
 
-iosClient = APNsClient('developent2.pem', use_sandbox= CONFIG.DEBUG)
+iosClient = APNsClient('developent2.pem', use_sandbox= CONFIG.DEBUG, heartbeat_period = 60000)
 
 def pushIOS(notifications):
     ret = iosClient.send_notification_batch(notifications, topic = 'com.guson.q8.voip')

@@ -26,8 +26,6 @@ class moduleFilter(logging.Filter):
 class CONFIG():
     #调试模式
     DEBUG = False
-    #服务监听端口
-    PORT = 5050
 
     #数据库配置
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:gusonweb@120.79.92.166:3306/freeswitch?charset=utf8'  #数据库URI
@@ -56,7 +54,7 @@ class CONFIG():
 
     # 日志配置 https://docs.python.org/3/library/logging.config.html
     # NEWLINE = '\n' if sysName == "Linux" else '\r\n'
-    LOGPATH = '/home/web/log/' if sysName == "Linux" else 'log/'
+    LOGPATH = os.environ.get("LOGPATH")
     LOGCONFIG = {
 	'version': 1,   # 表示模式版本的整数值。目前唯一有效的值是1
 	'disable_existing_loggers': True,   # 默认 True 禁用任何现有记录器
@@ -189,15 +187,29 @@ class CONFIG():
 			'maxBytes': 1024*1024*10,	#可选,当达到10MB时分割日志
 			'backupCount': 50,	#可选,最多保留50份文件
 		},
+		'apns': {	# fs短信及呼叫日志
+			'class': 'logging.handlers.RotatingFileHandler',	
+			'formatter': 'verbose',		#可选, 格式化程序ID
+			'level': 'DEBUG',			#可选, 日志级别
+            # 'filters': ['sioFilter'],	# [allow_foo]	可选, 过滤器ID
+			'filename': LOGPATH + 'apns.log',
+            'encoding': 'utf-8',	# 字符集
+			'maxBytes': 1024*1024*10,	#可选,当达到10MB时分割日志
+			'backupCount': 50,	#可选,最多保留50份文件
+		},
 	},
 	'loggers': {	# 记录器
-		'__name__': {
+		'app': {
 			'handlers': ['q9', 'q9_err', 'console', 'freeswitch', 'app', 'q8i', 'IOSpush', 'sio'],
 			'level': 'INFO',
             # 'filters': [allow_foo]	可选, 过滤器ID
 			#'propagate': '', #可选,传播设置  1表示消息必须从此记录器传播到记录器层次结构上方的处理程序，或者0表示消息不会传播到层次结构中的处理程序
 		},
+		'apns2': {
+			'handlers': ['apns', 'console'],
+			'level': 'DEBUG',
+            # 'filters': [allow_foo]	可选, 过滤器ID
+			#'propagate': '', #可选,传播设置  1表示消息必须从此记录器传播到记录器层次结构上方的处理程序，或者0表示消息不会传播到层次结构中的处理程序
+		},
 	}
 }
-
-logging.handlers.TimedRotatingFileHandler()

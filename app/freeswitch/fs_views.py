@@ -30,7 +30,7 @@ def fsplan():   # 执行计划
             logger.info("[%s]监视[%s] IP=[%s],PORT=[%s]", callfr, callee, to_ip, to_port)
         except:
             logger.warn('WARN: [%s]监视[%s],[%s]不在线,监视失败', callfr, callee, callee)
-            to_ip, to_port = ""
+            to_ip, to_port = "", ""
         bridges = "sofia/internal/camera@%s:%s" % (to_ip, to_port)
     else:   # 呼叫请求
         logger.info("BEGIN: [%s]呼叫[%s]", callfr, callee)
@@ -63,5 +63,5 @@ def chatplan(): # 短信发送配置
         logger.info("END  : [%s]发送消息给[%s] IP=[%s],PORT=[%s]", sendfr, sendto, to_ip, to_port)
     except:
         logger.warn('WARN : [%s]发送消息给[%s],[%s]不在线,发送失败', sendfr, sendto, sendto)
-        to_ip, to_port = ""
+        to_ip, to_port = "", ""
     return render_template("chatplan.html", to_sip_ip = to_ip, to_sip_port = to_port)
