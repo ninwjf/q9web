@@ -1,5 +1,3 @@
-import datetime
-import inspect
 import json
 import random
 import time
@@ -12,14 +10,14 @@ from app.tables import (STAT, Community, Monitor, MyHouse, Registrations,
 
 # 响应信息
 class RETURN():
-    SUCC        = {"Code": "00", "MESSAGE":"交易成功"}
-    PARMERR     = {"Code": "01", "MESSAGE":"参数错误"}
-    SYSERR      = {"Code": "02", "MESSAGE":"系统错误"}
-    COMNYERR    = {"Code": "03", "MESSAGE":"小区不存在"}
-    PWDERR      = {"Code": "04", "MESSAGE":"密码错误"}
+    SUCC = {"Code": "00", "MESSAGE": "交易成功"}
+    PARMERR = {"Code": "01", "MESSAGE": "参数错误"}
+    SYSERR = {"Code": "02", "MESSAGE": "系统错误"}
+    COMNYERR = {"Code": "03", "MESSAGE": "小区不存在"}
+    PWDERR = {"Code": "04", "MESSAGE": "密码错误"}
 
 
-def random_pwd(randomlength = 6):
+def random_pwd(randomlength=6):
     '''生成一个指定长度的随机数字字符串'''
     random_str = ''
     base_str = '0123456789'
@@ -30,12 +28,13 @@ def random_pwd(randomlength = 6):
         random_str += base_str[random.randint(0, length)]
     return random_str
 
+
 def user_add(monitors):
     ''' 批量增加监控设备 '''
     ret = RETURN.SUCC.copy()
     js = json.loads(monitors)
     monitor = []
-    for i in  js:
+    for i in js:
         userdel = User.query.filter(User.phone == i['Phone']).first()
         if userdel:
             db.session.delete(userdel)
@@ -47,9 +46,11 @@ def user_add(monitors):
     db.session.commit()
     return ret
 
-def monitor_list(community, st = STAT.OPEN):
+
+def monitor_list(community, st=STAT.OPEN):
     ''' 获取小区设备列表 '''
-    monitors = db.session.query(User.site).filter(community == User.communityID, st == User.status).all()
+    monitors = db.session.query(User.site).filter(
+        community == User.communityID, st == User.status).all()
     a = []
     for i in monitors:
         a.append(i._asdict())
@@ -58,9 +59,13 @@ def monitor_list(community, st = STAT.OPEN):
     ret['monitor'] = a
     return ret
 
-def house_list(community, st = STAT.OPEN):
+
+def house_list(community, st=STAT.OPEN):
     ''' 获取小区房间列表 '''
-    houses = db.session.query(MyHouse.phone, MyHouse.site, MyHouse.name, MyHouse.sex, MyHouse.uType).filter(community == MyHouse.communityID, st == MyHouse.status).all()
+    houses = db.session.query(MyHouse.phone, MyHouse.site, MyHouse.name,
+                              MyHouse.sex, MyHouse.uType).filter(
+                                  community == MyHouse.communityID,
+                                  st == MyHouse.status).all()
     a = []
     for i in houses:
         a.append(i._asdict())
@@ -69,9 +74,13 @@ def house_list(community, st = STAT.OPEN):
     ret['houses'] = a
     return ret
 
-def comny_login(account, pwd, st = STAT.OPEN):
+
+def comny_login(account, pwd, st=STAT.OPEN):
     ''' 小区权限验证 '''
-    comny = db.session.query(Community.communityID, Community.community).filter(account == Community.account, pwd == Community.pwd, st == Community.status).first()
+    comny = db.session.query(
+        Community.communityID, Community.community).filter(
+            account == Community.account, pwd == Community.pwd,
+            st == Community.status).first()
     if comny:
         ret = RETURN.SUCC.copy()
         ret['community'] = comny.communityID
@@ -80,9 +89,12 @@ def comny_login(account, pwd, st = STAT.OPEN):
         ret = RETURN.PWDERR.copy()
     return ret
 
-def comny_chgPwd(account, pwd, newPwd, st = STAT.OPEN):
+
+def comny_chgPwd(account, pwd, newPwd, st=STAT.OPEN):
     ''' 小区SIP管理员修改密码 '''
-    user = Community.query.filter(account == Community.account, pwd == Community.pwd, st == Community.status).first()
+    user = Community.query.filter(account == Community.account,
+                                  pwd == Community.pwd,
+                                  st == Community.status).first()
     if user:
         user.pwd = newPwd
         db.session.commit()
@@ -90,10 +102,15 @@ def comny_chgPwd(account, pwd, newPwd, st = STAT.OPEN):
     else:
         return RETURN.PWDERR
 
-def fs_sendChat(community, msg, dir, st = STAT.OPEN):
+
+def fs_sendChat(community, msg, dir, st=STAT.OPEN):
     # 获取推送列表
-    pushs = db.session.query(MyHouse.phone, MyHouse.community, Token.token).filter(community == MyHouse.communityID, dir == MyHouse.site, st == MyHouse.status,
-        MyHouse.phone == Token.phone, Token.tokenType == TokenType.IOS_VOIP, Token.status == STAT.OPEN).all()
+    pushs = db.session.query(
+        MyHouse.phone, MyHouse.community, Token.token).filter(
+            community == MyHouse.communityID, dir == MyHouse.site,
+            st == MyHouse.status, MyHouse.phone == Token.phone,
+            Token.tokenType == TokenType.IOS_VOIP,
+            Token.status == STAT.OPEN).all()
     tokens = []
     for i in pushs:
         tokens.append(i.token)
@@ -106,15 +123,20 @@ def fs_sendChat(community, msg, dir, st = STAT.OPEN):
         time.sleep(3)
 
     # 获取消息发送列表
-    sends = db.session.query(MyHouse.phone, MyHouse.community, Registrations.realm, Registrations.network_ip, Registrations.network_port).filter(community == MyHouse.communityID, dir == MyHouse.site, st == MyHouse.status,
-        Registrations.reg_user == MyHouse.phone).all()
+    sends = db.session.query(
+        MyHouse.phone, MyHouse.community, Registrations.realm,
+        Registrations.network_ip, Registrations.network_port).filter(
+            community == MyHouse.communityID, dir == MyHouse.site,
+            st == MyHouse.status,
+            Registrations.reg_user == MyHouse.phone).all()
     for i in sends:
         send_chat(i.phone + "@" + i.realm, i.network_ip, i.network_port, msg)
 
     ret = RETURN.SUCC.copy()
     return ret
 
-def house_Join(community, communityName, households, monitors, st =STAT.OPEN):
+
+def house_Join(community, communityName, households, monitors, st=STAT.OPEN):
     jshouseholds = json.loads(households)
     jsmonitors = json.loads(monitors)
     for household in jshouseholds:
@@ -133,7 +155,7 @@ def house_Join(community, communityName, households, monitors, st =STAT.OPEN):
         # 关联设备信息
         for monitor in jsmonitors:
             slen = monitor['Site'].find('00')
-            if slen == -1: 
+            if slen == -1:
                 slen = len(monitor['Site']) - 2
 
             # 区栋单元一致
@@ -151,15 +173,19 @@ def house_Join(community, communityName, households, monitors, st =STAT.OPEN):
     ret = RETURN.SUCC.copy()
     return ret
 
-def house_UnJoin(community, communityName, households, st =STAT.OPEN):
+
+def house_UnJoin(community, communityName, households, st=STAT.OPEN):
     jshouseholds = json.loads(households)
     for h in jshouseholds:
-        house = MyHouse.query.filter(h['Phone'] == MyHouse.phone, community == MyHouse.communityID, h['Site'] == MyHouse.site).first()
+        house = MyHouse.query.filter(h['Phone'] == MyHouse.phone,
+                                     community == MyHouse.communityID,
+                                     h['Site'] == MyHouse.site).first()
         db.session.delete(house)
-        montr = Monitor.query.filter(h['Phone'] == Monitor.phone, community == Monitor.communityID).all()
+        montr = Monitor.query.filter(h['Phone'] == Monitor.phone,
+                                     community == Monitor.communityID).all()
         for i in montr:
             slen = i.site.find('00')
-            if slen == -1: 
+            if slen == -1:
                 slen = len(i.site) - 2
 
             # 区栋单元一致
@@ -168,50 +194,3 @@ def house_UnJoin(community, communityName, households, st =STAT.OPEN):
     db.session.commit()
     ret = RETURN.SUCC.copy()
     return ret
-
-################################# 单个添加弃用 ######################################
-#
-#	def house_add(phone, comnyID, comnyName, site, st=STAT.OPEN):
-#	    ''' 添加住宅信息 '''
-#	    house = MyHouse()
-#	    house.phone = phone
-#	    house.community = comnyName
-#	    house.communityID = comnyID
-#	    house.site = site
-#	    house.sip = comnyID + site
-#	    house.status = st
-#	    db.session.add(house)
-#	    db.session.commit()
-#	    return RETURN.SUCC
-#	
-#	def house_del(phone, comnyID, site):
-#	    ''' 删除住宅信息 '''
-#	    house = MyHouse.query.filter(phone == MyHouse.phone, comnyID == MyHouse.communityID, site == MyHouse.site).first()
-#	    if house is None:
-#	        return 
-#	    db.session.delete(house)
-#	    db.session.commit()
-#	    return RETURN.SUCC
-#	
-#	def monitor_add(phone, comnyID, comnyName, devicetype, site, st=STAT.OPEN):
-#	    ''' 添加监控信息 '''
-#	    monitor = Monitor()
-#	    monitor.phone = phone
-#	    monitor.community = comnyName
-#	    monitor.communityID = comnyID
-#	    monitor.devicetype = devicetype
-#	    monitor.site = site
-#	    monitor.sip = comnyID + site
-#	    monitor.status = st
-#	    db.session.add(monitor)
-#	    db.session.commit()
-#	    return RETURN.SUCC
-#	
-#	def monitor_del(phone, comnyID, site):
-#	    ''' 删除监控信息 '''
-#	    monitor = Monitor.query.filter(phone == Monitor.phone, comnyID == Monitor.communityID, site == Monitor.site).first()
-#	    if monitor is None:
-#	        return 
-#	    db.session.delete(monitor)
-#	    db.session.commit()
-#	    return RETURN.SUCC

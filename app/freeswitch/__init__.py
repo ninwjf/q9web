@@ -2,12 +2,8 @@
 """
     freeswitch相关代码
 """
-
-import os
 from flask import Blueprint
-import logging
 
 freeswitch = Blueprint('freeswitch', __name__, template_folder='./templates')
 
-
-from app.freeswitch import fs_views
+from . import fs_views

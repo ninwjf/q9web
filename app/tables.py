@@ -1,24 +1,21 @@
-import datetime, json
-
 from app import db
+
 
 # 状态
 class STAT():
-    OPEN    = 0 # 正常，已注册
-    DEL     = 1 # 注销，未注册
-    LOCK    = 2 # 锁定, 已注册
-    
-    ToString = {
-        OPEN: u"正常",
-        DEL: u"注销",
-        LOCK: u"锁定"
-    }
+    OPEN = 0  # 正常，已注册
+    DEL = 1  # 注销，未注册
+    LOCK = 2  # 锁定, 已注册
+
+    ToString = {OPEN: u"正常", DEL: u"注销", LOCK: u"锁定"}
+
 
 class TokenType():
-    IOS_APNS = 0 # IOS APNS推送
-    IOS_VOIP = 1 # IOS VOIP推送
+    IOS_APNS = 0  # IOS APNS推送
+    IOS_VOIP = 1  # IOS VOIP推送
 
-def SiteToName(site, devicetype = None):
+
+def SiteToName(site, devicetype=None):
     # 010101000004 12位 转 01区01栋01单元门口机04
     # 0101010301 10位 转 01区01栋01单元0301室
     strl = len(site)
@@ -38,12 +35,14 @@ def SiteToName(site, devicetype = None):
         name += site[6:10] + u"室"
     return name
 
+
 class DeciveTYPE():
     #ControlServer     = 0
-    DoorCamera        = 1
-    LabbyPhone        = 2
-    Building          = 3
-    Wall              = 4
+    DoorCamera = 1
+    LabbyPhone = 2
+    Building = 3
+    Wall = 4
+
     #IndoorPhone       = 5
     #AdministratorUnit = 6
     #IndoorPhoneSD     = 7
@@ -59,10 +58,10 @@ class DeciveTYPE():
 
     JS = {
         #ControlServer:     u"管理中心",
-        DoorCamera:        u"别墅机",
-        LabbyPhone:        u"门口机", # 单元门口机
-        Building:          u"门口机", # 栋门口机
-        Wall:              u"围墙机",
+        DoorCamera: u"别墅机",
+        LabbyPhone: u"门口机",  # 单元门口机
+        Building: u"门口机",  # 栋门口机
+        Wall: u"围墙机",
         #IndoorPhone:       u"室内机",
         #AdministratorUnit: u"管理中心机",
         #IndoorPhoneSD:     u"带SD卡的室内机",
@@ -74,11 +73,12 @@ class DeciveTYPE():
         #Other:             u"未知设备"
     }
 
+
 class User(db.Model):
     ''' fs用户信息表 包含手机APP用户 以及 小区设备'''
     __tablename__ = 'web_user'
     id = db.Column(db.Integer, db.Sequence('user_id_seq'), primary_key=True)
-    phone = db.Column(db.String(25))    # 电话号码或者设备SIP号
+    phone = db.Column(db.String(25))  # 电话号码或者设备SIP号
     usertype = db.Column(db.Integer)
     pwd = db.Column(db.String(16))
     dtTime = db.Column(db.DateTime)
@@ -104,16 +104,18 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.i
 
+
 class Sms(db.Model):
     ''' 短信验证码表 '''
     __tablename__ = 'web_sms'
     id = db.Column(db.Integer, db.Sequence('sms_id_seq'), primary_key=True)
-    phone = db.Column(db.String(20)) 
+    phone = db.Column(db.String(20))
     code = db.Column(db.String(6))
     dtTime = db.Column(db.DateTime)
 
     def __repr__(self):
         return '<Sms %s,%s,%s>' % self.phone, self.code, self.dtTime
+
 
 class MyHouse(db.Model):
     ''' 我的住宅 '''
@@ -127,11 +129,12 @@ class MyHouse(db.Model):
     community = db.Column(db.String(100))
     communityID = db.Column(db.String(10))
     site = db.Column(db.String(15))
-    sip = db.Column(db.String(25))      # 虚拟SIP号
+    sip = db.Column(db.String(25))  # 虚拟SIP号
     status = db.Column(db.Integer)
 
     def __repr__(self):
         return '<House %s,%s,%s>' % self.phone, self.communityID, self.site
+
 
 class Community(db.Model):
     ''' 小区 '''
@@ -139,10 +142,11 @@ class Community(db.Model):
     id = db.Column(db.Integer, db.Sequence('cmny_id_seq'), primary_key=True)
     community = db.Column(db.String(100))
     communityID = db.Column(db.String(10))
-    account = db.Column(db.String(20)) 
+    account = db.Column(db.String(20))
     pwd = db.Column(db.String(16))
     parentAcc = db.Column(db.String(16))
     status = db.Column(db.Integer)
+
 
 class Monitor(db.Model):
     ''' 监控设备列表 '''
@@ -156,6 +160,7 @@ class Monitor(db.Model):
     sip = db.Column(db.String(25))
     status = db.Column(db.Integer)
 
+
 class Token(db.Model):
     ''' 监控设备列表 '''
     __tablename__ = 'web_token'
@@ -166,6 +171,7 @@ class Token(db.Model):
     uuid = db.Column(db.String(40))
     dtTime = db.Column(db.DateTime)
     status = db.Column(db.Integer)
+
 
 ############# freeswitch #######################
 class Registrations(db.Model):

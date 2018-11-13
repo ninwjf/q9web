@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 import random
 import uuid
 
@@ -9,44 +10,49 @@ from app.tables import (STAT, DeciveTYPE, Monitor, MyHouse, SiteToName, Sms,
 from config import CONFIG
 from dysms_python.demo_sms_send import send_sms
 
+logger = logging.getLogger(__name__)
+
 
 class SMSTYPE():
     ''' 短信类型 0 注册 1 找回密码'''
-    REGT = '0'    # 注册
-    PWD = '1'     # 找回密码
+    REGT = '0'  # 注册
+    PWD = '1'  # 找回密码
+
 
 class RETURN():
     ''' 响应码，响应信息 '''
-    SUCC        = {"Code": "00", "MESSAGE":"交易成功"}
-    REG_SUCC    = {"Code": "00", "MESSAGE":"注册成功"}
-    SMS_SUCC    = {"Code": "00", "MESSAGE":"短信发送成功"}
-    PWD_SUCC    = {"Code": "00", "MESSAGE":"密码修改成功"}
-    CMD_SUCC    = {"Code": "00", "MESSAGE":"指令发送成功"}
+    SUCC = {"Code": "00", "MESSAGE": "交易成功"}
+    REG_SUCC = {"Code": "00", "MESSAGE": "注册成功"}
+    SMS_SUCC = {"Code": "00", "MESSAGE": "短信发送成功"}
+    PWD_SUCC = {"Code": "00", "MESSAGE": "密码修改成功"}
+    CMD_SUCC = {"Code": "00", "MESSAGE": "指令发送成功"}
 
-    PARMERR     = {"Code": "01", "MESSAGE":"参数错误"}
-    SYSERR      = {"Code": "02", "MESSAGE":"系统错误"}
-    PHONEERR    = {"Code": "03", "MESSAGE":"非法手机号"}
-    PWDERR      = {"Code": "04", "MESSAGE":"密码错误"}
-    SMSCHKERR   = {"Code": "05", "MESSAGE":"验证码不正确"}
-    EXIST       = {"Code": "06", "MESSAGE":"已注册"}
-    RPTREQ      = {"Code": "07", "MESSAGE":"重复请求"}
-    NOTIMES     = {"Code": "08", "MESSAGE":"已达请求次数上限"}
-    AMOUNTEMPTY = {"Code": "09", "MESSAGE":"账户余额不足"}
-    NOTEXIST    = {"Code": "10", "MESSAGE":"用户不存在"}
-    MNITNOEXIT  = {"Code": "11", "MESSAGE":"监控设备不存在"}
-
+    PARMERR = {"Code": "01", "MESSAGE": "参数错误"}
+    SYSERR = {"Code": "02", "MESSAGE": "系统错误"}
+    PHONEERR = {"Code": "03", "MESSAGE": "非法手机号"}
+    PWDERR = {"Code": "04", "MESSAGE": "密码错误"}
+    SMSCHKERR = {"Code": "05", "MESSAGE": "验证码不正确"}
+    EXIST = {"Code": "06", "MESSAGE": "已注册"}
+    RPTREQ = {"Code": "07", "MESSAGE": "重复请求"}
+    NOTIMES = {"Code": "08", "MESSAGE": "已达请求次数上限"}
+    AMOUNTEMPTY = {"Code": "09", "MESSAGE": "账户余额不足"}
+    NOTEXIST = {"Code": "10", "MESSAGE": "用户不存在"}
+    MNITNOEXIT = {"Code": "11", "MESSAGE": "监控设备不存在"}
 
 
 def house_get(phone, st=STAT.OPEN):
     ''' 获取住宅信息 '''
-    houses = db.session.query(MyHouse.communityID, MyHouse.community, MyHouse.site).filter(phone == MyHouse.phone, st == MyHouse.status).all()
+    houses = db.session.query(MyHouse.communityID, MyHouse.community,
+                              MyHouse.site).filter(phone == MyHouse.phone,
+                                                   st == MyHouse.status).all()
     a = []
     for i in houses:
         a.append(i._asdict())
 
-    ret = RETURN.SUCC.copy()    #必需使用
+    ret = RETURN.SUCC.copy()  # 必需使用
     ret['myhouse'] = a
     return ret
+
 
 def monitor_open(sip):
     ''' 二维码开锁，未实现 '''
@@ -54,14 +60,20 @@ def monitor_open(sip):
     ret['key'] = sip
     return ret
 
+
 def monitor_chk(phone, sip):
     ''' 设备效验 '''
-    i = Monitor.query.filter(phone == Monitor.phone, sip == Monitor.sip, STAT.OPEN == Monitor.status).count()
+    i = Monitor.query.filter(phone == Monitor.phone, sip == Monitor.sip,
+                             STAT.OPEN == Monitor.status).count()
     return i > 0
+
 
 def monitor_get(phone, st=STAT.OPEN):
     ''' 获取可监控设备列表 '''
-    monit = db.session.query(Monitor.sip, Monitor.communityID, Monitor.community, Monitor.devicetype, Monitor.site).filter(phone == Monitor.phone, st == Monitor.status).all()
+    monit = db.session.query(Monitor.sip, Monitor.communityID,
+                             Monitor.community, Monitor.devicetype,
+                             Monitor.site).filter(phone == Monitor.phone,
+                                                  st == Monitor.status).all()
     a = []
     for i in monit:
         b = i._asdict()
@@ -69,20 +81,23 @@ def monitor_get(phone, st=STAT.OPEN):
         b['devicetype'] = DeciveTYPE().GetString(b['devicetype'])
         a.append(b)
 
-
     ret = RETURN.SUCC.copy()
     ret['Monitor'] = a
     return ret
 
+
 def user_checkPWD(phone, pwd):
     ''' 验证用户密码 '''
-    i = User.query.filter(phone == User.phone, pwd == User.pwd, STAT.OPEN == User.status).count()
+    i = User.query.filter(phone == User.phone, pwd == User.pwd,
+                          STAT.OPEN == User.status).count()
     return i > 0
+
 
 def user_isExist(phone):
     ''' 用户已注册 '''
     i = User.query.filter(phone == User.phone, STAT.DEL != User.status).count()
     return i > 0
+
 
 def user_chgpwd(phone, pwd):
     ''' 修改密码 '''
@@ -92,10 +107,12 @@ def user_chgpwd(phone, pwd):
         db.session.commit()
     return RETURN.PWD_SUCC
 
+
 def user_registered(phone, pwd):
     ''' 用户注册 '''
     user_addOrChg(phone, pwd)
     return RETURN.REG_SUCC
+
 
 def user_add(phone, pwd, dt=datetime.datetime.now(), st=STAT.OPEN):
     ''' 用户添加 '''
@@ -106,6 +123,7 @@ def user_add(phone, pwd, dt=datetime.datetime.now(), st=STAT.OPEN):
     user.status = st
     db.session.add(user)
     db.session.commit()
+
 
 def user_addOrChg(phone, pwd, dt=datetime.datetime.now(), st=STAT.OPEN):
     ''' 用户添加或修改 '''
@@ -128,7 +146,8 @@ def sms_add(phone, code):
     db.session.add(sms)
     db.session.commit()
 
-def random_num(randomlength = 6):
+
+def random_num(randomlength=6):
     '''生成一个指定长度的随机数字字符串'''
     random_str = ''
     base_str = '0123456789'
@@ -137,35 +156,39 @@ def random_num(randomlength = 6):
         random_str += base_str[random.randint(0, length)]
     return random_str
 
-def sms_reqIsRepeat(phone, seconds = CONFIG.SMS_EXPIRY_TIME):
+
+def sms_reqIsRepeat(phone, seconds=CONFIG.SMS_EXPIRY_TIME):
     '''短信重复申请'''
     now = datetime.datetime.now()
     time = now - datetime.timedelta(minutes=seconds)
     i = Sms.query.filter(phone == Sms.phone, Sms.dtTime > time).count()
     return i > 0
 
-def sms_reqNoTimes(phone, times = CONFIG.SMS_SEND_TIMES):
+
+def sms_reqNoTimes(phone, times=CONFIG.SMS_SEND_TIMES):
     '''超时当天允许发送次数'''
     now = datetime.datetime.now()
-    today = datetime.datetime(now.year, now.month, now.day, 0, 0, 0) 
+    today = datetime.datetime(now.year, now.month, now.day, 0, 0, 0)
     dt = Sms.query.filter(phone == Sms.phone, Sms.dtTime > today).count()
     return dt > times
-
 
 
 def sms_check(phone, code, seconds=CONFIG.SMS_EXPIRY_TIME):
     ''' 验证短信验证码 '''
     now = datetime.datetime.now()
-    time = now - datetime.timedelta(minutes=seconds) 
-    ret = Sms.query.filter(phone == Sms.phone, code == Sms.code, Sms.dtTime > time).count()
+    time = now - datetime.timedelta(minutes=seconds)
+    ret = Sms.query.filter(phone == Sms.phone, code == Sms.code,
+                           Sms.dtTime > time).count()
     return ret > 0
 
-def sms_send(phone, tmpl = CONFIG.SMS_TMPL_CODE):
+
+def sms_send(phone, tmpl=CONFIG.SMS_TMPL_CODE):
     '''短信发送'''
     code = random_num()
     sms_add(phone, code)
 
-    s = send_sms(uuid.uuid1(), phone, CONFIG.SMS_SIGN_NAME, tmpl, "{\"code\":\"%s\"}" % code)
+    s = send_sms(uuid.uuid1(), phone, CONFIG.SMS_SIGN_NAME, tmpl,
+                 "{\"code\":\"%s\"}" % code)
     ret = json.loads(s)['Code']
     if ret == 'OK':
         return RETURN.SMS_SUCC
@@ -176,16 +199,25 @@ def sms_send(phone, tmpl = CONFIG.SMS_TMPL_CODE):
     else:
         return RETURN.SYSERR
 
-def sms_del(expiryTime = CONFIG.SMS_EXPIRY_TIME):
+
+def sms_del(expiryTime=CONFIG.SMS_EXPIRY_TIME):
     ''' 定时清理验证码表 '''
     now = datetime.datetime.now()
-    today = datetime.datetime(now.year, now.month, now.day, 0, 0, 0) 
+    today = datetime.datetime(now.year, now.month, now.day, 0, 0, 0)
     todaydel = today - datetime.timedelta(minutes=expiryTime)  # 未过验证时间的短信不能删除
     smsYesterday = Sms.query.filter_by(todaydel > Sms.dtTime).all()
     db.session.delete(smsYesterday)
     db.session.commit()
 
-def disable_safties(phone, communityID, communityName, addr, time, typee, action, funback = None):
+
+def disable_safties(phone,
+                    communityID,
+                    communityName,
+                    addr,
+                    time,
+                    typee,
+                    action,
+                    funback=None):
     ''' 通过SOCKEIO，向管理中心发送撤防指令 '''
     disbSaftMsg = {
         "phone": phone,
@@ -200,11 +232,16 @@ def disable_safties(phone, communityID, communityName, addr, time, typee, action
     send2Q8i(MSGTYPE.Disarm, disbSaftMsg, funback)
     return RETURN.CMD_SUCC
 
-    
-def token_add(phone, tokenType, token, uuid, dt=datetime.datetime.now(), st=STAT.OPEN):
+
+def token_add(phone,
+              tokenType,
+              token,
+              uuid,
+              dt=datetime.datetime.now(),
+              st=STAT.OPEN):
     ''' 添加IOS设备deviceToken '''
     tok = Token.query.filter(phone == Token.phone).first()
-    if tok is  None:
+    if tok is None:
         tok = Token()
     tok.phone = phone
     tok.tokenType = tokenType
@@ -217,10 +254,11 @@ def token_add(phone, tokenType, token, uuid, dt=datetime.datetime.now(), st=STAT
 
     return RETURN.SUCC
 
+
 def log_out(phone):
     ''' 添加IOS设备deviceToken '''
     tok = Token.query.filter(phone == Token.phone).first()
-    if tok is  None:
+    if tok is None:
         tok = Token()
     tok.status = STAT.LOCK
     db.session.add(tok)
