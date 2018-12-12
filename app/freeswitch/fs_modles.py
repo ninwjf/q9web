@@ -49,4 +49,4 @@ def PushCALL(sip):
 
     if len(bridges) > 0:
         pushCallIOS(tokens, bridges[0].community, bridges[0].site)
-        time.sleep(3)
+        time.sleep(4)

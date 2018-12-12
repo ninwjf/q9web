@@ -107,7 +107,7 @@ def fs_sendChat(community, msg, dir, st=STAT.OPEN):
     # 获取推送列表
     pushs = db.session.query(
         MyHouse.phone, MyHouse.community, Token.token).filter(
-            community == MyHouse.communityID, dir == MyHouse.site,
+            community == MyHouse.communityID, MyHouse.site.like(dir + "%"),
             st == MyHouse.status, MyHouse.phone == Token.phone,
             Token.tokenType == TokenType.IOS_VOIP,
             Token.status == STAT.OPEN).all()
@@ -126,7 +126,7 @@ def fs_sendChat(community, msg, dir, st=STAT.OPEN):
     sends = db.session.query(
         MyHouse.phone, MyHouse.community, Registrations.realm,
         Registrations.network_ip, Registrations.network_port).filter(
-            community == MyHouse.communityID, dir == MyHouse.site,
+            community == MyHouse.communityID, MyHouse.site.like(dir + "%"),
             st == MyHouse.status,
             Registrations.reg_user == MyHouse.phone).all()
     for i in sends:

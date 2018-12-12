@@ -83,7 +83,7 @@ def sendMsg():  # 发送短信
     logger.info("BEGIN: community=[%s],msgDir=[%s],msgTxt=[%s]", community,
                 msgDir, msgTxt)
     ret = RETURN.SYSERR
-    if not (msgDir and community and msgTxt):  # 参数错误
+    if not (community and msgTxt):  # 参数错误
         ret = RETURN.PARMERR
     ret = fs_sendChat(community, msgTxt, msgDir)
     logger.info("END  : ret=[%s]", ret)
